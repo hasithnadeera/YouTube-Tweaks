@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "YouTube Tweaks",
-  "version": "1.1.4",
+  "version": "2.1.0",
   "description": "Adds a sleek speed controller to the YouTube player and auto-skips sponsor segments using SponsorBlock data.",
   "icons": {
     "16": "icons/icon16.png",
@@ -21,5 +21,10 @@
     "default_title": "YouTube Tweaks"
   },
   "permissions": ["storage"],
-  "host_permissions": ["https://sponsor.ajay.app/*"]
+  "host_permissions": [
+    "https://sponsor.ajay.app/*",
+    "https://yt3.ggpht.com/*",
+    "https://yt3.googleusercontent.com/*",
+    "https://i.ytimg.com/*"
+  ]
 }

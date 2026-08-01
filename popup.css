@@ -12,6 +12,7 @@
   --chip-on-bg: #fff;
   --chip-on-border: #d5d5d5;
   --track: #ccc;
+  --bar-track: #e8e8e8;
   --accent: #ff0000;
 }
 
@@ -28,6 +29,7 @@
     --chip-on-bg: #383838;
     --chip-on-border: #555;
     --track: #555;
+    --bar-track: #2c2c2c;
     --accent: #ff0000;
   }
 }
@@ -35,7 +37,7 @@
 * { box-sizing: border-box; }
 
 body {
-  width: 300px;
+  width: 320px;
   margin: 0;
   font-family: 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
   font-size: 13px;
@@ -43,15 +45,25 @@ body {
   color: var(--text);
 }
 
+[hidden] { display: none !important; }
+
 /* ===== Header ===== */
 
 .header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 9px;
-  padding: 11px 16px;
+  padding: 11px 12px 11px 16px;
   background-color: var(--surface);
   border-bottom: 1px solid var(--border);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
 }
 
 .logo {
@@ -66,7 +78,229 @@ body {
   letter-spacing: 0.01em;
 }
 
-/* ===== Groups ===== */
+.version {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-faint);
+  line-height: 1;
+  padding-top: 1px;
+}
+
+.header-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  color: var(--text-dim);
+  background: none;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.header-btn:hover {
+  color: var(--text);
+  background-color: var(--chip-bg);
+}
+
+/* ===== Overview ===== */
+
+.overview {
+  padding: 14px 16px 16px;
+}
+
+.hero {
+  padding: 14px 14px 12px;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.hero-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.hero-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.hero-value {
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.hero-sub {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.stats-reset {
+  font-family: inherit;
+  font-size: 11px;
+  color: var(--text-faint);
+  background: none;
+  border: none;
+  padding: 4px 7px;
+  border-radius: 5px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.stats-reset:hover {
+  color: var(--accent);
+  background-color: var(--chip-bg);
+}
+
+.analytics {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.analytics-block .group-label {
+  padding: 0 0 8px;
+}
+
+/* ===== Channel bars ===== */
+
+.channel-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.bar-time {
+  font-size: 11px;
+  color: var(--text-dim);
+  flex-shrink: 0;
+}
+
+.bar-track {
+  height: 6px;
+  background-color: var(--bar-track);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  min-width: 2px;
+}
+
+.channel-row {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.channel-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.channel-rank {
+  width: 14px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-faint);
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.analytics-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.analytics-heading .group-label {
+  padding: 0;
+  margin: 0;
+}
+
+.link-btn {
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-faint);
+  background: none;
+  border: none;
+  padding: 4px 6px;
+  border-radius: 5px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.link-btn:hover {
+  color: var(--accent);
+  background-color: var(--chip-bg);
+}
+
+.link-btn-block {
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: 8px;
+  margin-top: 4px;
+}
+
+.channel-avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background-color: var(--chip-bg);
+  color: var(--text-dim);
+  font-size: 10px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.channel-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.channel-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.channel-row .bar-track {
+  margin-left: 22px;
+  height: 4px;
+}
+
+/* ===== Groups (Settings) ===== */
 
 .group {
   background-color: var(--surface);
@@ -149,138 +383,3 @@ body {
 
 input:checked + .slider { background-color: var(--accent); }
 input:checked + .slider:before { transform: translateX(15px); }
-
-/* ===== Category chips ===== */
-
-/* Dimmed wholesale when segment skipping is off - the chips are meaningless
-   while nothing is being skipped. */
-#cat-section.disabled .cat-grid,
-#cat-section.disabled .cat-more {
-  opacity: 0.4;
-  pointer-events: none;
-}
-
-.cat-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 5px;
-  padding: 2px 16px 4px;
-}
-
-/* The dot carries the same colour as that segment's marker on the YouTube
-   scrubber, so this grid doubles as a legend for the timeline. */
-.cat-chip {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  padding: 6px 8px;
-  font-family: inherit;
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--text-dim);
-  text-align: left;
-  background-color: var(--chip-bg);
-  border: 1px solid transparent;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
-}
-
-.cat-chip:hover { background-color: var(--chip-bg-hover); }
-.cat-chip[hidden] { display: none; }
-
-.cat-chip .dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  opacity: 0.3;
-  transition: opacity 0.15s ease;
-}
-
-.cat-chip[aria-pressed="true"] {
-  color: var(--text);
-  background-color: var(--chip-on-bg);
-  border-color: var(--chip-on-border);
-  font-weight: 600;
-}
-
-.cat-chip[aria-pressed="true"] .dot { opacity: 1; }
-
-.cat-more {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  width: 100%;
-  padding: 6px 16px 9px;
-  font-family: inherit;
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--text-faint);
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-
-.cat-more:hover { color: var(--text-dim); }
-
-.chevron {
-  width: 5px;
-  height: 5px;
-  border-right: 1.5px solid currentColor;
-  border-bottom: 1.5px solid currentColor;
-  transform: translateY(-2px) rotate(45deg);
-  transition: transform 0.18s ease;
-}
-
-.cat-more[aria-expanded="true"] .chevron {
-  transform: translateY(1px) rotate(-135deg);
-}
-
-/* ===== Stats footer ===== */
-
-/* Reports a result rather than offering a choice, so it sits outside the
-   groups and reads as a summary. */
-.stats {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 10px 16px;
-  background-color: var(--bg);
-}
-
-.stats-line {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-
-.stats-value {
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.stats-sub {
-  font-size: 11px;
-  color: var(--text-faint);
-}
-
-.stats-reset {
-  font-family: inherit;
-  font-size: 11px;
-  color: var(--text-faint);
-  background: none;
-  border: none;
-  padding: 4px 7px;
-  border-radius: 5px;
-  cursor: pointer;
-  flex-shrink: 0;
-}
-
-.stats-reset:hover {
-  color: var(--accent);
-  background-color: var(--chip-bg);
-}

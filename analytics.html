@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube Tweaks — Analytics</title>
+  <link rel="stylesheet" href="analytics.css">
+</head>
+<body>
+  <div class="page">
+    <header class="page-header">
+      <div class="brand">
+        <img class="logo" src="icons/icon48.png" alt="" width="28" height="28">
+        <div>
+          <h1>YouTube analytics</h1>
+          <p class="subtitle">Watch time, sponsors skipped, and per-channel breakdown</p>
+        </div>
+      </div>
+      <button class="ghost-btn" id="btn-reset" type="button">Reset all</button>
+    </header>
+
+    <div class="toolbar">
+      <div class="range-tabs" role="tablist">
+        <button class="range-tab" type="button" data-range="day" aria-selected="false">Day</button>
+        <button class="range-tab" type="button" data-range="week" aria-selected="true">Week</button>
+        <button class="range-tab" type="button" data-range="month" aria-selected="false">Month</button>
+        <button class="range-tab" type="button" data-range="custom" aria-selected="false">Custom</button>
+      </div>
+      <div class="custom-range" id="custom-range" hidden>
+        <label>From <input type="date" id="date-from"></label>
+        <label>To <input type="date" id="date-to"></label>
+      </div>
+    </div>
+
+    <section class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Watched</div>
+        <div class="stat-value" id="stat-watched">0s</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Time saved</div>
+        <div class="stat-value accent" id="stat-saved">0s</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Videos</div>
+        <div class="stat-value" id="stat-videos">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Channels</div>
+        <div class="stat-value" id="stat-channels">0</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <h2 id="trend-title">Watch time by day</h2>
+        <span class="card-hint">Hours</span>
+      </div>
+      <div class="chart" id="trend-chart"></div>
+      <div class="legend">
+        <span class="legend-item"><i class="swatch watched"></i> Watched</span>
+        <span class="legend-item"><i class="swatch saved"></i> Saved</span>
+      </div>
+    </section>
+
+    <div class="split">
+      <section class="card">
+        <div class="card-head"><h2>Watch time by channel</h2></div>
+        <div class="hbar-list" id="channel-watch-bars"></div>
+      </section>
+      <section class="card">
+        <div class="card-head"><h2>Sponsors skipped share</h2></div>
+        <div class="pie-wrap">
+          <svg class="pie" id="skip-pie" viewBox="0 0 120 120" aria-hidden="true"></svg>
+          <div class="pie-legend" id="pie-legend"></div>
+        </div>
+      </section>
+    </div>
+
+    <section class="card">
+      <div class="card-head"><h2>Channel breakdown</h2></div>
+      <div class="table-wrap">
+        <table class="channel-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Channel</th>
+              <th class="num">Watched</th>
+              <th class="num">Saved</th>
+              <th class="num">Videos</th>
+              <th class="num">Avg / video</th>
+            </tr>
+          </thead>
+          <tbody id="channel-table-body">
+          </tbody>
+        </table>
+      </div>
+      <p class="empty" id="table-empty" hidden>No activity in this range yet. Watch some YouTube and skip sponsors to fill this in.</p>
+    </section>
+  </div>
+
+  <script src="analytics.js"></script>
+</body>
+</html>

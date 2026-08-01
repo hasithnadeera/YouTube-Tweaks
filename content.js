@@ -16,27 +16,25 @@
   const MARKER_BAR_ID = 'ysc-sponsor-bar';
   const TOAST_TIMEOUT_MS = 5000;
   const COUNTDOWN_LEAD_SECONDS = 3;  // warn this long before a segment starts
-  const STATS_KEY = 'skip_stats';    // { seconds, count } in chrome.storage.local
+  // { seconds, count, byCategory, byChannel } in chrome.storage.local
+  const STATS_KEY = 'skip_stats';
+  const EMPTY_STATS = { seconds: 0, count: 0, byCategory: {}, byChannel: {} };
+  // Date-bucketed watch + skip analytics: { days: { "YYYY-MM-DD": {...} } }
+  const ANALYTICS_KEY = 'analytics';
+  const EMPTY_ANALYTICS = { days: {} };
+  const WATCH_TICK_MS = 5000;
 
   // ─── Sponsor Skip: Categories ────────────────────────────────────
   // Colours match SponsorBlock's own palette, so the scrubber markers read the
-  // same way they do in the original extension. Everything but `sponsor` ships
-  // off - intros and outros in particular are a matter of taste, and skipping
-  // them uninvited makes the extension feel broken.
+  // same way they do in the original extension. Only sponsor segments are
+  // fetched and skipped - other categories are intentionally out of scope.
 
   const CATEGORIES = [
-    { id: 'sponsor',        storageKey: 'cat_sponsor',        label: 'Sponsor',      color: '#00d400', on: true },
-    { id: 'selfpromo',      storageKey: 'cat_selfpromo',      label: 'Self-promo',   color: '#ffff00', on: false },
-    { id: 'interaction',    storageKey: 'cat_interaction',    label: 'Sub reminder', color: '#cc00ff', on: false },
-    { id: 'intro',          storageKey: 'cat_intro',          label: 'Intro',        color: '#00ffff', on: false },
-    { id: 'outro',          storageKey: 'cat_outro',          label: 'Outro',        color: '#0202ed', on: false },
-    { id: 'preview',        storageKey: 'cat_preview',        label: 'Recap',        color: '#008fd6', on: false },
-    { id: 'filler',         storageKey: 'cat_filler',         label: 'Filler',       color: '#7300ff', on: false },
-    { id: 'music_offtopic', storageKey: 'cat_music_offtopic', label: 'Non-music',    color: '#ff9900', on: false }
+    { id: 'sponsor', label: 'Sponsor', color: '#00d400' }
   ];
 
   const CATEGORY_BY_ID = new Map(CATEGORIES.map((c) => [c.id, c]));
-  const enabledCategories = new Set(CATEGORIES.filter((c) => c.on).map((c) => c.id));
+  const enabledCategories = new Set(['sponsor']);
   const HASH_PREFIX_LENGTH = 4;   // SponsorBlock privacy endpoint accepts 4-32 hex chars
   const MERGE_GAP_SECONDS = 1;    // fold duplicate submissions, preserve real gaps
   const SKIP_TAIL_MARGIN = 0.15;  // don't micro-seek at the very end of a segment
@@ -129,24 +127,6 @@
         resetSponsorState();
       }
     }
-
-    let categoriesChanged = false;
-    for (const category of CATEGORIES) {
-      if (settings[category.storageKey] === undefined) continue;
-      categoriesChanged = true;
-      if (settings[category.storageKey]) {
-        enabledCategories.add(category.id);
-      } else {
-        enabledCategories.delete(category.id);
-      }
-    }
-
-    // The request only asks for enabled categories, so a newly enabled one is
-    // absent from the cached payload - clear the active id to force a refetch.
-    if (categoriesChanged && activeVideoId) {
-      activeVideoId = null;
-      syncSponsorSegments();
-    }
   }
 
   // Load initial settings (defaults mirrored in popup.js)
@@ -157,7 +137,6 @@
     center_player: true,
     skip_sponsors: true
   };
-  CATEGORIES.forEach((c) => { SETTING_DEFAULTS[c.storageKey] = c.on; });
 
   chrome.storage.sync.get(SETTING_DEFAULTS, applyToggles);
 
@@ -531,25 +510,227 @@
     // fires `ended`, so the end screen, autoplay-next and playlists behave
     // just as if the video had played out.
     video.currentTime = endsVideo ? duration : segment.end;
-    recordSkip(segment.end - segment.start, 1);
+    recordSkip(segment.end - segment.start, 1, {
+      categoryId: segment.category,
+      channel: getChannelInfo()
+    });
     showSkipToast(segment);
+  }
+
+  /**
+   * Channel id + display name + avatar from the watch-page owner block. Prefer a
+   * UC id when the link is /channel/UC…; fall back to @handle so handle-only
+   * channels still aggregate. Returns null when the owner chrome is not on
+   * the page.
+   */
+  function getChannelInfo() {
+    const link =
+      document.querySelector('#owner #channel-name a') ||
+      document.querySelector('ytd-video-owner-renderer ytd-channel-name a') ||
+      document.querySelector('ytd-channel-name a');
+    if (!link) return null;
+
+    const name = (link.textContent || '').trim();
+    if (!name) return null;
+
+    const href = link.getAttribute('href') || '';
+    const channelMatch = href.match(/\/channel\/(UC[\w-]+)/);
+    const handleMatch = href.match(/\/@([\w.-]+)/);
+    const id = (channelMatch && channelMatch[1]) ||
+               (handleMatch && `@${handleMatch[1]}`) ||
+               name;
+
+    const img =
+      document.querySelector('#owner #avatar img') ||
+      document.querySelector('ytd-video-owner-renderer #avatar img') ||
+      document.querySelector('ytd-video-owner-renderer img#img') ||
+      document.querySelector('#channel-header-container img#img');
+    let avatar = '';
+    if (img) {
+      avatar = (img.currentSrc || img.src || '').trim();
+      if (!avatar && img.srcset) {
+        const first = img.srcset.split(',')[0];
+        avatar = (first && first.trim().split(/\s+/)[0]) || '';
+      }
+    }
+
+    return { id, name, avatar };
+  }
+
+  function todayKey(date = new Date()) {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
+
+  function bumpBucket(map, key, seconds, count, extra) {
+    const prev = map[key] || { seconds: 0, count: 0 };
+    const next = {
+      seconds: Math.max(0, prev.seconds + seconds),
+      count: Math.max(0, prev.count + count),
+      ...extra
+    };
+    // Keep avatar/name even when undoing to zero if other fields remain;
+    // drop the entry only when both tallies are gone.
+    if (next.seconds === 0 && next.count === 0) {
+      delete map[key];
+    } else {
+      map[key] = next;
+    }
+  }
+
+  function ensureDay(days, key) {
+    if (!days[key]) {
+      days[key] = { watched: 0, skipped: 0, skipCount: 0, channels: {} };
+    }
+    return days[key];
+  }
+
+  function ensureDayChannel(day, channelId, channel) {
+    if (!day.channels[channelId]) {
+      day.channels[channelId] = {
+        name: (channel && channel.name) || channelId,
+        avatar: (channel && channel.avatar) || '',
+        watched: 0,
+        skipped: 0,
+        skipCount: 0,
+        videoIds: []
+      };
+    }
+    const entry = day.channels[channelId];
+    if (channel && channel.name) entry.name = channel.name;
+    if (channel && channel.avatar) entry.avatar = channel.avatar;
+    return entry;
+  }
+
+  function touchVideoId(entry, videoId) {
+    if (!videoId) return;
+    if (!Array.isArray(entry.videoIds)) entry.videoIds = [];
+    if (!entry.videoIds.includes(videoId)) entry.videoIds.push(videoId);
   }
 
   /**
    * Running total of what has been skipped. Lives in storage.local, not sync -
    * sync has a modest per-hour write quota and this ticks on every segment.
+   * Also bumps today's analytics day-bucket for range reports.
    */
-  function recordSkip(seconds, count) {
-    chrome.storage.local.get({ [STATS_KEY]: { seconds: 0, count: 0 } }, (data) => {
-      const stats = data[STATS_KEY] || { seconds: 0, count: 0 };
-      chrome.storage.local.set({
-        [STATS_KEY]: {
-          seconds: Math.max(0, stats.seconds + seconds),
-          count: Math.max(0, stats.count + count)
+  function recordSkip(seconds, count, meta) {
+    chrome.storage.local.get(
+      { [STATS_KEY]: EMPTY_STATS, [ANALYTICS_KEY]: EMPTY_ANALYTICS },
+      (data) => {
+        const prev = data[STATS_KEY] || EMPTY_STATS;
+        const byCategory = { ...(prev.byCategory || {}) };
+        const byChannel = { ...(prev.byChannel || {}) };
+
+        if (meta && meta.categoryId) {
+          bumpBucket(byCategory, meta.categoryId, seconds, count);
         }
-      });
+        if (meta && meta.channel && meta.channel.id) {
+          const extra = { name: meta.channel.name };
+          if (meta.channel.avatar) extra.avatar = meta.channel.avatar;
+          else if (byChannel[meta.channel.id] && byChannel[meta.channel.id].avatar) {
+            extra.avatar = byChannel[meta.channel.id].avatar;
+          }
+          bumpBucket(byChannel, meta.channel.id, seconds, count, extra);
+        }
+
+        const analytics = data[ANALYTICS_KEY] || EMPTY_ANALYTICS;
+        const days = { ...(analytics.days || {}) };
+        const day = ensureDay(days, todayKey());
+        day.skipped = Math.max(0, (day.skipped || 0) + seconds);
+        day.skipCount = Math.max(0, (day.skipCount || 0) + count);
+        day.channels = { ...(day.channels || {}) };
+
+        if (meta && meta.channel && meta.channel.id) {
+          const ch = ensureDayChannel(day, meta.channel.id, meta.channel);
+          ch.skipped = Math.max(0, (ch.skipped || 0) + seconds);
+          ch.skipCount = Math.max(0, (ch.skipCount || 0) + count);
+          touchVideoId(ch, getCurrentVideoId());
+        }
+
+        chrome.storage.local.set({
+          [STATS_KEY]: {
+            seconds: Math.max(0, (prev.seconds || 0) + seconds),
+            count: Math.max(0, (prev.count || 0) + count),
+            byCategory,
+            byChannel
+          },
+          [ANALYTICS_KEY]: { days }
+        });
+      }
+    );
+  }
+
+  // ─── Watch-time tracker ──────────────────────────────────────────
+  // Accrues wall-clock seconds while the main video is playing, the tab is
+  // visible, and YouTube is not showing an ad. Batched every WATCH_TICK_MS.
+
+  let watchLastTs = 0;
+  let watchPendingSeconds = 0;
+  let watchFlushTimer = null;
+
+  function shouldAccrueWatch() {
+    if (document.visibilityState !== 'visible') return false;
+    if (!isOnVideoPage() || isAdPlaying()) return false;
+    const video = getVideo();
+    return !!(video && !video.paused && !video.ended);
+  }
+
+  function flushWatchTime() {
+    const seconds = watchPendingSeconds;
+    watchPendingSeconds = 0;
+    if (seconds < 0.5) return;
+
+    const channel = getChannelInfo();
+    const videoId = getCurrentVideoId();
+
+    chrome.storage.local.get({ [ANALYTICS_KEY]: EMPTY_ANALYTICS }, (data) => {
+      const analytics = data[ANALYTICS_KEY] || EMPTY_ANALYTICS;
+      const days = { ...(analytics.days || {}) };
+      const day = ensureDay(days, todayKey());
+      day.watched = (day.watched || 0) + seconds;
+      day.channels = { ...(day.channels || {}) };
+
+      if (channel && channel.id) {
+        const ch = ensureDayChannel(day, channel.id, channel);
+        ch.watched = (ch.watched || 0) + seconds;
+        touchVideoId(ch, videoId);
+      }
+
+      chrome.storage.local.set({ [ANALYTICS_KEY]: { days } });
     });
   }
+
+  function scheduleWatchFlush() {
+    if (watchFlushTimer) return;
+    watchFlushTimer = setTimeout(() => {
+      watchFlushTimer = null;
+      flushWatchTime();
+    }, WATCH_TICK_MS);
+  }
+
+  function tickWatchTime() {
+    const now = Date.now();
+    if (watchLastTs && shouldAccrueWatch()) {
+      const delta = (now - watchLastTs) / 1000;
+      // Ignore huge gaps (sleep / background throttling).
+      if (delta > 0 && delta < 30) {
+        watchPendingSeconds += delta;
+        scheduleWatchFlush();
+      }
+    }
+    watchLastTs = shouldAccrueWatch() ? now : 0;
+  }
+
+  setInterval(tickWatchTime, 1000);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState !== 'visible') {
+      tickWatchTime();
+      flushWatchTime();
+      watchLastTs = 0;
+    }
+  });
 
   function handleTimeUpdate(event) {
     if (!skipSponsorsEnabled || !activeSegments.length) return;
@@ -808,7 +989,10 @@
     unskippedKeys.add(segment.key);
     removeSkipToast();
     // It was not really skipped after all - take it back out of the tally.
-    recordSkip(-(segment.end - segment.start), -1);
+    recordSkip(-(segment.end - segment.start), -1, {
+      categoryId: segment.category,
+      channel: getChannelInfo()
+    });
 
     const video = getVideo();
     if (video) video.currentTime = segment.start;
