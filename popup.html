@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header class="header">
+    <img class="logo" src="icons/icon48.png" alt="" width="20" height="20">
+    <h1>YouTube Tweaks</h1>
+  </header>
+
+  <section class="group">
+    <h2 class="group-label">Player</h2>
+
+    <div class="row">
+      <div class="row-info"><span class="title">Speed selector</span></div>
+      <label class="switch">
+        <input type="checkbox" id="toggle-speed">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="row">
+      <div class="row-info">
+        <span class="title">Center player</span>
+        <span class="desc">Hides suggestions, centers the video</span>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="toggle-layout">
+        <span class="slider"></span>
+      </label>
+    </div>
+  </section>
+
+  <section class="group">
+    <h2 class="group-label">Clean up</h2>
+
+    <div class="row">
+      <div class="row-info"><span class="title">Hide Shorts</span></div>
+      <label class="switch">
+        <input type="checkbox" id="toggle-shorts">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="row">
+      <div class="row-info">
+        <span class="title">Hide actions</span>
+        <span class="desc">Removes like &amp; share, keeps Save</span>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="toggle-actions">
+        <span class="slider"></span>
+      </label>
+    </div>
+  </section>
+
+  <section class="group" id="cat-section">
+    <h2 class="group-label">SponsorBlock</h2>
+
+    <div class="row">
+      <div class="row-info">
+        <span class="title">Skip segments</span>
+        <span class="desc">Community-flagged, skipped automatically</span>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="toggle-sponsors">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="cat-grid" id="cat-grid"></div>
+    <button class="cat-more" id="cat-more" type="button" aria-expanded="false" aria-controls="cat-grid">
+      <span id="cat-more-label">4 more</span><span class="chevron"></span>
+    </button>
+  </section>
+
+  <footer class="stats">
+    <div class="stats-line">
+      <span class="stats-value" id="stats-time">—</span>
+      <span class="stats-sub" id="stats-count"></span>
+    </div>
+    <button class="stats-reset" id="stats-reset" type="button">Reset</button>
+  </footer>
+
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,330 @@
+/* ===== YouTube Tweaks - Injected Styles ===== */
+
+#yt-speed-controller {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  margin-left: auto; /* push to right if not using space-between */
+  font-family: 'Roboto', 'YouTube Sans', sans-serif;
+  flex-wrap: nowrap;
+}
+
+#yt-speed-controller .ysc-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #aaa;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-right: 4px;
+  user-select: none;
+}
+
+#yt-speed-controller .ysc-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  color: #e0e0e0;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  cursor: pointer;
+  outline: none;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+  letter-spacing: 0.02em;
+  user-select: none;
+  white-space: nowrap;
+}
+
+#yt-speed-controller .ysc-btn:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.28);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+#yt-speed-controller .ysc-btn:active {
+  transform: translateY(0px) scale(0.97);
+  box-shadow: none;
+}
+
+#yt-speed-controller .ysc-btn.ysc-active {
+  background: #ff0000;
+  border-color: #ff0000;
+  color: #fff;
+  box-shadow: 0 0 12px rgba(255, 0, 0, 0.45);
+}
+
+#yt-speed-controller .ysc-btn.ysc-active:hover {
+  background: #e60000;
+  border-color: #e60000;
+  box-shadow: 0 2px 14px rgba(255, 0, 0, 0.55);
+}
+
+/* Light mode overrides */
+html[dark="false"] #yt-speed-controller .ysc-btn,
+ytd-app[is-dark-theme_="false"] #yt-speed-controller .ysc-btn {
+  color: #333;
+  background: rgba(0, 0, 0, 0.06);
+  border-color: rgba(0, 0, 0, 0.14);
+}
+
+html[dark="false"] #yt-speed-controller .ysc-btn:hover,
+ytd-app[is-dark-theme_="false"] #yt-speed-controller .ysc-btn:hover {
+  background: rgba(0, 0, 0, 0.12);
+  color: #000;
+}
+
+html[dark="false"] #yt-speed-controller .ysc-label,
+ytd-app[is-dark-theme_="false"] #yt-speed-controller .ysc-label {
+  color: #666;
+}
+
+/* Fade-in animation when injected */
+@keyframes ysc-fadein {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+#yt-speed-controller {
+  animation: ysc-fadein 0.25s ease forwards;
+}
+
+/* ==========================================================================
+   Distraction-Free Features
+   ========================================================================== */
+
+/* 1. Hide YouTube Shorts Globally */
+
+/* Home page / Search shelves */
+body.ysc-hide-shorts ytd-rich-shelf-renderer[is-shorts],
+body.ysc-hide-shorts ytd-reel-shelf-renderer,
+/* Sidebar links */
+body.ysc-hide-shorts ytd-guide-entry-renderer a[title="Shorts"],
+body.ysc-hide-shorts ytd-mini-guide-entry-renderer[aria-label="Shorts"],
+/* Navigation Tabs */
+body.ysc-hide-shorts ytd-tabbed-page-header ytd-tab[title="Shorts"],
+body.ysc-hide-shorts yt-tab-shape[tab-title="Shorts"],
+/* General shorts links/containers */
+body.ysc-hide-shorts a[href^="/shorts"],
+body.ysc-hide-shorts ytd-thumbnail[is-shorts]
+{
+  display: none !important;
+}
+
+/* 2. Hide All Action Buttons Except "Save" */
+
+/* Hide all top-level buttons (Like, Dislike, Share, Clip, Download) */
+body.ysc-hide-actions #top-level-buttons-computed > * {
+  display: none !important;
+}
+
+/* Hide overflow buttons (often visible when screen is small) */
+body.ysc-hide-actions #flexible-item-buttons > * {
+  display: none !important;
+}
+
+/* Hide the More Actions (3 dots) menu button entirely */
+body.ysc-hide-actions ytd-menu-renderer yt-icon-button#button[aria-label="More actions"],
+body.ysc-hide-actions ytd-menu-renderer button[aria-label="More actions"] {
+  display: none !important;
+}
+
+/* Specifically un-hide the Save button */
+body.ysc-hide-actions #top-level-buttons-computed > *:has(button[aria-label*="Save" i]),
+body.ysc-hide-actions #top-level-buttons-computed > *:has(button[aria-label*="keep" i]), /* "Keep" sometimes used instead of Save */
+body.ysc-hide-actions #top-level-buttons-computed > *:has(path[d^="M22 13h-4v4h-2v-4h-4v-2h4V7h2v4h4v2zm-8-6H2v1h12V7z"]), /* Generic matching for save icon path just in case */
+body.ysc-hide-actions #flexible-item-buttons > *:has(button[aria-label*="Save" i]) {
+  display: flex !important;
+}
+
+/* 3. Remove Suggested Videos & Center Player */
+
+/* Hide the secondary sidebar completely */
+body.ysc-center-player #secondary,
+body.ysc-center-player #secondary-inner,
+body.ysc-center-player ytd-watch-next-secondary-results-renderer {
+  display: none !important;
+  width: 0 !important;
+  min-width: 0 !important;
+}
+
+/* Clip horizontal overflow at the document root (keeps vertical scroll) */
+html:has(body.ysc-center-player) {
+  overflow-x: hidden !important;
+}
+
+/* Contain overflow in the watch page wrapper */
+body.ysc-center-player ytd-watch-flexy,
+body.ysc-center-player ytd-page-manager,
+body.ysc-center-player #page-manager {
+  overflow-x: hidden !important;
+}
+
+/* Center the primary column */
+body.ysc-center-player ytd-watch-flexy #columns {
+  justify-content: center !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+body.ysc-center-player ytd-watch-flexy #primary {
+  margin-left: auto !important;
+  margin-right: auto !important;
+  max-width: 1280px !important;
+  padding-right: 0 !important;
+}
+
+/* Let the video container expand naturally in the center */
+body.ysc-center-player #player-container-outer {
+  max-width: 100% !important;
+}
+
+/* ==========================================================================
+   Sponsor Skip
+   ========================================================================== */
+
+/* 1. Progress-bar markers */
+
+#ysc-sponsor-bar {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 100%; /* narrowed by syncMarkerHeight() to the visible track height */
+  transform: translateY(-50%);
+  pointer-events: none; /* never interfere with scrubbing or hover previews */
+  z-index: 30;          /* above .ytp-play-progress, below the scrubber handle */
+}
+
+#ysc-sponsor-bar .ysc-sponsor-marker {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  background: #00d400; /* SponsorBlock green - readable over YouTube's red bar */
+}
+
+/* 2. Skip toast */
+
+/* Mirrors the speed controller's pill language: same radius, hover lift and
+   glow, so the two injected UIs read as one extension. */
+
+#ysc-sponsor-toast {
+  position: absolute;
+  right: 12px;
+  bottom: 70px; /* clears the progress bar and the bottom control chrome */
+  z-index: 62;  /* above .ytp-chrome-bottom */
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 60%;
+  padding: 5px 6px 5px 14px;
+  border-radius: 22px;
+  background: rgba(15, 15, 15, 0.5);
+  /* Heavier blur carries the legibility the opacity no longer does */
+  backdrop-filter: blur(18px) saturate(1.3);
+  -webkit-backdrop-filter: blur(18px) saturate(1.3);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  font-family: 'Roboto', 'YouTube Sans', sans-serif;
+  font-size: 13px;
+  line-height: 1;
+  color: #f1f1f1;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.55); /* keeps text readable on bright video */
+  user-select: none;
+  cursor: default;
+  animation: ysc-toast-in 0.22s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+/* Fullscreen chrome is taller - lift the toast clear of it */
+#movie_player.ytp-fullscreen #ysc-sponsor-toast {
+  bottom: 96px;
+}
+
+#ysc-sponsor-toast .ysc-toast-text {
+  white-space: nowrap;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: #e8e8e8;
+}
+
+/* Countdown numeral - tabular so 3>2>1 doesn't shuffle the pill's width */
+#ysc-sponsor-toast .ysc-toast-count {
+  min-width: 12px;
+  margin-left: -3px;
+  font-size: 15px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  color: #00d400;
+}
+
+#ysc-sponsor-toast .ysc-toast-count[hidden] {
+  display: none;
+}
+
+/* Each number lands bright and fades away as its second runs out - no scale,
+   opacity only. `forwards` holds the dimmed end state, so a paused video
+   leaves the digit faint rather than snapping back to full. It settles at 0.3
+   rather than 0 so the number never actually disappears. */
+#ysc-sponsor-toast .ysc-toast-count.ysc-count-tick {
+  animation: ysc-count-tick 0.85s ease-out forwards;
+}
+
+@keyframes ysc-count-tick {
+  0%   { opacity: 1; }
+  100% { opacity: 0.3; }
+}
+
+#ysc-sponsor-toast .ysc-toast-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 14px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #e0e0e0;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  cursor: pointer;
+  outline: none;
+  white-space: nowrap;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+}
+
+#ysc-sponsor-toast .ysc-toast-btn:hover {
+  background: #00d400;
+  border-color: #00d400;
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 14px rgba(0, 212, 0, 0.5);
+}
+
+#ysc-sponsor-toast .ysc-toast-btn:active {
+  transform: translateY(0) scale(0.97);
+  box-shadow: none;
+}
+
+#ysc-sponsor-toast.ysc-toast-out {
+  animation: ysc-toast-out 0.18s ease forwards;
+}
+
+@keyframes ysc-toast-in {
+  from { opacity: 0; transform: translateX(16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes ysc-toast-out {
+  from { opacity: 1; transform: translateX(0); }
+  to   { opacity: 0; transform: translateX(16px); }
+}

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96">
+  <title>YouTube Tweaks</title>
+  <defs>
+    <linearGradient id="badge" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ff3b30"/>
+      <stop offset="1" stop-color="#c00000"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Badge -->
+  <rect width="96" height="96" rx="21" fill="url(#badge)"/>
+
+  <!-- Skip-forward glyph: the extension jumps you past things -->
+  <g fill="#fff">
+    <path d="M23 25 L45 44 L23 63 Z"/>
+    <path d="M43 25 L65 44 L43 63 Z"/>
+    <rect x="67" y="25" width="7" height="38" rx="3.5"/>
+  </g>
+
+  <!-- Scrubber with a sponsor segment, in SponsorBlock green -->
+  <rect x="20" y="72" width="56" height="6" rx="3" fill="#fff" opacity="0.32"/>
+  <rect x="50" y="72" width="18" height="6" rx="3" fill="#00d400"/>
+</svg>

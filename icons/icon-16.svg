@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96">
+  <title>YouTube Tweaks (small)</title>
+  <!-- Simplified sibling of icon.svg for 16px: the scrubber and the second
+       chevron collapse to noise at that size, so only the skip mark survives,
+       drawn chunkier to hold its shape on a 16px grid. -->
+  <defs>
+    <linearGradient id="badge16" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ff3b30"/>
+      <stop offset="1" stop-color="#c00000"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="96" height="96" rx="21" fill="url(#badge16)"/>
+
+  <g fill="#fff">
+    <path d="M24 22 L57 48 L24 74 Z"/>
+    <rect x="61" y="22" width="11" height="52" rx="5"/>
+  </g>
+</svg>
