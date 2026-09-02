@@ -377,6 +377,10 @@ body {
   flex-shrink: 0;
 }
 
+.pie[hidden] {
+  display: none !important;
+}
+
 .pie-legend {
   display: flex;
   flex-direction: column;
@@ -407,6 +411,12 @@ body {
   text-overflow: ellipsis;
   white-space: nowrap;
   color: var(--text);
+}
+
+.pie-time {
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-dim);
 }
 
 .table-wrap { overflow-x: auto; }
@@ -461,4 +471,99 @@ body {
   color: var(--text-faint);
   text-align: center;
   padding: 24px 8px;
+}
+
+/* ─── Header actions, banners, retention ───────────────────────── */
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.file-btn {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+}
+
+.ghost-btn.danger:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.banner {
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, var(--surface));
+  color: var(--text);
+  font-size: 13px;
+}
+
+.banner-ok {
+  border-color: var(--saved);
+  background: color-mix(in srgb, var(--saved) 10%, var(--surface));
+}
+
+.range-error {
+  margin: -8px 0 16px;
+  color: var(--accent);
+  font-size: 13px;
+}
+
+.retention {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-dim);
+  font-size: 13px;
+}
+
+.retention select {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font: inherit;
+}
+
+.stat-note {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-faint);
+  border-bottom: 1px dotted var(--text-faint);
+  cursor: help;
+}
+
+/* ─── Top videos table ─────────────────────────────────────────── */
+
+.video-thumb {
+  width: 64px;
+  height: 36px;
+  object-fit: cover;
+  border-radius: 4px;
+  display: block;
+}
+
+.video-title {
+  color: var(--text);
+  text-decoration: none;
+  display: block;
+  max-width: 380px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.video-title:hover {
+  text-decoration: underline;
+}
+
+.channel-table td.muted {
+  color: var(--text-dim);
 }

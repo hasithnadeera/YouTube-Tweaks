@@ -63,7 +63,10 @@
       <h2 class="group-label">Player</h2>
 
       <div class="row">
-        <div class="row-info"><span class="title">Speed selector</span></div>
+        <div class="row-info">
+          <span class="title">Speed selector</span>
+          <span class="desc">Currently <span id="speed-value">1×</span> · <kbd>[</kbd> <kbd>]</kbd> to step, <kbd>\</kbd> to toggle</span>
+        </div>
         <label class="switch">
           <input type="checkbox" id="toggle-speed">
           <span class="slider"></span>
@@ -115,6 +118,21 @@
         </div>
         <label class="switch">
           <input type="checkbox" id="toggle-sponsors">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </section>
+
+    <section class="group">
+      <h2 class="group-label">Analytics</h2>
+
+      <div class="row">
+        <div class="row-info">
+          <span class="title">Watch analytics shortcut</span>
+          <span class="desc">Replaces Create — opens your watch history stats</span>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="toggle-studio-analytics">
           <span class="slider"></span>
         </label>
       </div>

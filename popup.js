@@ -52,6 +52,19 @@ function openAnalytics() {
   chrome.tabs.create({ url: chrome.runtime.getURL('analytics.html') });
 }
 
+function sendBackgroundMessage(message) {
+  return new Promise((resolve) => {
+    try {
+      chrome.runtime.sendMessage(message, (response) => {
+        const err = chrome.runtime.lastError;
+        resolve(err ? { ok: false, error: err.message } : (response || { ok: false }));
+      });
+    } catch (err) {
+      resolve({ ok: false, error: err.message });
+    }
+  });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const viewOverview = document.getElementById('view-overview');
   const viewSettings = document.getElementById('view-settings');
@@ -68,6 +81,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const toggleSponsors = document.getElementById('toggle-sponsors');
   const toggleActions = document.getElementById('toggle-actions');
   const toggleLayout = document.getElementById('toggle-layout');
+  const toggleStudioAnalytics = document.getElementById('toggle-studio-analytics');
+  const speedValue = document.getElementById('speed-value');
 
   const statsTime = document.getElementById('stats-time');
   const statsCount = document.getElementById('stats-count');
@@ -83,7 +98,9 @@ document.addEventListener('DOMContentLoaded', () => {
     speed_selector: true,
     hide_actions: true,
     center_player: true,
-    skip_sponsors: true
+    skip_sponsors: true,
+    studio_analytics_shortcut: true,
+    playback_speed: 1
   };
 
   let cachedStats = EMPTY_STATS;
@@ -216,12 +233,29 @@ document.addEventListener('DOMContentLoaded', () => {
     );
   }
 
-  statsReset.addEventListener('click', () => {
+  statsReset.addEventListener('click', async () => {
+    const reset = await sendBackgroundMessage({ type: 'RESET_ANALYTICS' });
+    if (reset.ok) {
+      renderOverview(
+        { seconds: 0, count: 0, byCategory: {}, byChannel: {} },
+        { days: {}, schemaVersion: 2 }
+      );
+      return;
+    }
+
+    // Keep reset usable if the service worker is temporarily unavailable.
     const zeroStats = { seconds: 0, count: 0, byCategory: {}, byChannel: {} };
-    const zeroAnalytics = { days: {} };
+    const zeroAnalytics = { days: {}, schemaVersion: 2 };
     chrome.storage.local.set(
       { [STATS_KEY]: zeroStats, [ANALYTICS_KEY]: zeroAnalytics },
-      () => renderOverview(zeroStats, zeroAnalytics)
+      () => {
+        const err = chrome.runtime.lastError;
+        if (err) {
+          statsCount.textContent = `Reset failed: ${err.message}`;
+          return;
+        }
+        renderOverview(zeroStats, zeroAnalytics);
+      }
     );
   });
 
@@ -242,6 +276,14 @@ document.addEventListener('DOMContentLoaded', () => {
     toggleSponsors.checked = data.skip_sponsors;
     toggleActions.checked = data.hide_actions;
     toggleLayout.checked = data.center_player;
+    if (toggleStudioAnalytics) toggleStudioAnalytics.checked = data.studio_analytics_shortcut;
+    if (speedValue) speedValue.textContent = `${data.playback_speed}×`;
+  });
+
+  // The content script owns the speed; the popup just reflects it.
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area !== 'sync' || !changes.playback_speed || !speedValue) return;
+    speedValue.textContent = `${changes.playback_speed.newValue}×`;
   });
 
   loadStats();
@@ -267,4 +309,10 @@ document.addEventListener('DOMContentLoaded', () => {
   toggleLayout.addEventListener('change', (e) => {
     chrome.storage.sync.set({ center_player: e.target.checked });
   });
+
+  if (toggleStudioAnalytics) {
+    toggleStudioAnalytics.addEventListener('change', (e) => {
+      chrome.storage.sync.set({ studio_analytics_shortcut: e.target.checked });
+    });
+  }
 });

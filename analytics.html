@@ -16,13 +16,23 @@
           <p class="subtitle">Watch time, sponsors skipped, and per-channel breakdown</p>
         </div>
       </div>
-      <button class="ghost-btn" id="btn-reset" type="button">Reset all</button>
+      <div class="header-actions">
+        <button class="ghost-btn" id="btn-export-csv" type="button">Export CSV</button>
+        <button class="ghost-btn" id="btn-export-json" type="button">Export JSON</button>
+        <label class="ghost-btn file-btn">
+          Import JSON
+          <input type="file" id="input-import" accept="application/json,.json" hidden>
+        </label>
+        <button class="ghost-btn danger" id="btn-reset" type="button">Reset all</button>
+      </div>
     </header>
+
+    <p class="banner" id="write-banner" hidden></p>
 
     <div class="toolbar">
       <div class="range-tabs" role="tablist">
-        <button class="range-tab" type="button" data-range="day" aria-selected="false">Day</button>
-        <button class="range-tab" type="button" data-range="week" aria-selected="true">Week</button>
+        <button class="range-tab" type="button" data-range="day" aria-selected="true">Day</button>
+        <button class="range-tab" type="button" data-range="week" aria-selected="false">Week</button>
         <button class="range-tab" type="button" data-range="month" aria-selected="false">Month</button>
         <button class="range-tab" type="button" data-range="custom" aria-selected="false">Custom</button>
       </div>
@@ -30,7 +40,16 @@
         <label>From <input type="date" id="date-from"></label>
         <label>To <input type="date" id="date-to"></label>
       </div>
+      <label class="retention">Keep
+        <select id="retention-select">
+          <option value="30">30 days</option>
+          <option value="90">90 days</option>
+          <option value="180">180 days</option>
+          <option value="0">Forever</option>
+        </select>
+      </label>
     </div>
+    <p class="range-error" id="range-error" hidden></p>
 
     <section class="stats-row">
       <div class="stat-card">
@@ -48,6 +67,10 @@
       <div class="stat-card">
         <div class="stat-label">Channels</div>
         <div class="stat-value" id="stat-channels">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Data used <span class="stat-note" title="Estimated from the resolution played, not measured. Expect roughly ±20%.">est.</span></div>
+        <div class="stat-value" id="stat-data">—</div>
       </div>
     </section>
 
@@ -89,6 +112,7 @@
               <th class="num">Saved</th>
               <th class="num">Videos</th>
               <th class="num">Avg / video</th>
+              <th class="num">Data (est.)</th>
             </tr>
           </thead>
           <tbody id="channel-table-body">
@@ -96,6 +120,29 @@
         </table>
       </div>
       <p class="empty" id="table-empty" hidden>No activity in this range yet. Watch some YouTube and skip sponsors to fill this in.</p>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <h2>Top videos</h2>
+        <span class="card-hint">Most watched in this range</span>
+      </div>
+      <div class="table-wrap">
+        <table class="channel-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Video</th>
+              <th>Channel</th>
+              <th class="num">Watched</th>
+              <th class="num">Saved</th>
+            </tr>
+          </thead>
+          <tbody id="video-table-body">
+          </tbody>
+        </table>
+      </div>
+      <p class="empty" id="video-table-empty" hidden>No videos recorded in this range yet.</p>
     </section>
   </div>
 
