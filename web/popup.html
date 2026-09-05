@@ -8,7 +8,12 @@
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
-  <main class="popup-shell"><nav aria-label="Features"><a href="../popup.html">YouTube controls</a> · <span>Website controls</span></nav>
+  <main class="popup-shell">
+    <nav class="flow-nav" aria-label="FlowPlay areas">
+      <a href="../popup.html">YouTube</a>
+      <span class="active" aria-current="page">Websites</span>
+      <a href="../options/options.html" target="_blank">All settings</a>
+    </nav>
     <header class="popup-header">
       <div class="brand">
         <img src="../icons/icon48.png" alt="">
@@ -21,13 +26,13 @@
     </header>
 
     <section id="restricted-card" class="notice" hidden>
-      Brave protects this page from extensions. Open a regular HTTP or HTTPS website to use Powerhouse.
+      Your browser protects this page from extensions. Open a regular website to use FlowPlay controls.
     </section>
 
     <section id="controls" class="card controls" aria-label="Website controls">
       <div class="setting-row master-row">
         <div class="setting-copy">
-          <label for="site-enabled">Powerhouse on this site</label>
+          <label for="site-enabled">FlowPlay on this site</label>
           <p>Exact hostname only</p>
         </div>
         <label class="switch"><input id="site-enabled" type="checkbox"><span></span></label>
@@ -43,31 +48,6 @@
         <label class="switch"><input id="scrollbar-autohide" type="checkbox"><span></span></label>
       </div>
 
-      <div class="setting-row stacked">
-        <div class="setting-copy"><label for="dimmer-enabled">Page dimmer</label></div>
-        <label class="switch"><input id="dimmer-enabled" type="checkbox"><span></span></label>
-        <div class="range-row">
-          <input id="dimmer-amount" type="range" min="0" max="30" step="1">
-          <output id="dimmer-output" for="dimmer-amount">10%</output>
-        </div>
-      </div>
-
-      <div class="setting-row">
-        <div class="setting-copy">
-          <label for="focus-enabled">Focus Mode</label>
-          <p>Hide page chrome and distractions</p>
-        </div>
-        <label class="switch"><input id="focus-enabled" type="checkbox"><span></span></label>
-      </div>
-
-      <div class="setting-row">
-        <div class="setting-copy"><label for="motion-mode">Motion</label></div>
-        <select id="motion-mode">
-          <option value="system">Follow system</option>
-          <option value="reduce">Reduce motion</option>
-          <option value="normal">Allow motion</option>
-        </select>
-      </div>
     </section>
 
     <footer class="popup-footer">

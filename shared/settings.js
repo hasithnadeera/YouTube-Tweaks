@@ -22,31 +22,6 @@
       trackColor: 'transparent',
       minThumb: 36,
       radius: 999
-    },
-    selection: {
-      enabled: true,
-      background: '#5eead4',
-      color: '#042f2e'
-    },
-    focusRing: {
-      enabled: true,
-      color: '#5eead4',
-      width: 2
-    },
-    formAccent: {
-      enabled: true,
-      color: '#5eead4'
-    },
-    motion: {
-      mode: 'system',
-      smoothScroll: false
-    },
-    dimmer: {
-      enabled: false,
-      amount: 10
-    },
-    focusMode: {
-      enabled: false
     }
   };
 
@@ -62,8 +37,7 @@
         trackColor: 'transparent',
         minThumb: 36,
         radius: 999
-      },
-      focusRing: { enabled: true, color: '#5eead4', width: 2 }
+      }
     },
     comfortable: {
       scrollbar: {
@@ -76,8 +50,7 @@
         trackColor: '#0f172a',
         minThumb: 40,
         radius: 999
-      },
-      focusRing: { enabled: true, color: '#22d3ee', width: 2 }
+      }
     },
     highContrast: {
       scrollbar: {
@@ -90,8 +63,7 @@
         trackColor: '#111827',
         minThumb: 44,
         radius: 999
-      },
-      focusRing: { enabled: true, color: '#22d3ee', width: 3 }
+      }
     }
   };
 
@@ -147,10 +119,6 @@
     const preset = ['minimal', 'comfortable', 'highContrast', 'custom'].includes(input.preset)
       ? input.preset
       : defaults.preset;
-    const motionMode = ['system', 'reduce', 'normal'].includes(input.motion && input.motion.mode)
-      ? input.motion.mode
-      : defaults.motion.mode;
-
     return {
       version: 1,
       enabled: typeof input.enabled === 'boolean' ? input.enabled : defaults.enabled,
@@ -189,56 +157,6 @@
           999,
           defaults.scrollbar.radius
         )
-      },
-      selection: {
-        enabled: typeof (input.selection && input.selection.enabled) === 'boolean'
-          ? input.selection.enabled
-          : defaults.selection.enabled,
-        background: normalizeColor(
-          input.selection && input.selection.background,
-          defaults.selection.background
-        ),
-        color: normalizeColor(input.selection && input.selection.color, defaults.selection.color)
-      },
-      focusRing: {
-        enabled: typeof (input.focusRing && input.focusRing.enabled) === 'boolean'
-          ? input.focusRing.enabled
-          : defaults.focusRing.enabled,
-        color: normalizeColor(input.focusRing && input.focusRing.color, defaults.focusRing.color),
-        width: clampNumber(
-          input.focusRing && input.focusRing.width,
-          1,
-          5,
-          defaults.focusRing.width
-        )
-      },
-      formAccent: {
-        enabled: typeof (input.formAccent && input.formAccent.enabled) === 'boolean'
-          ? input.formAccent.enabled
-          : defaults.formAccent.enabled,
-        color: normalizeColor(input.formAccent && input.formAccent.color, defaults.formAccent.color)
-      },
-      motion: {
-        mode: motionMode,
-        smoothScroll: typeof (input.motion && input.motion.smoothScroll) === 'boolean'
-          ? input.motion.smoothScroll
-          : defaults.motion.smoothScroll
-      },
-      dimmer: {
-        enabled: typeof (input.dimmer && input.dimmer.enabled) === 'boolean'
-          ? input.dimmer.enabled
-          : defaults.dimmer.enabled,
-        amount: clampNumber(
-          input.dimmer && input.dimmer.amount,
-          0,
-          30,
-          defaults.dimmer.amount
-        )
-      },
-      focusMode: {
-        enabled: typeof (input.focusMode && input.focusMode.enabled) === 'boolean'
-          ? input.focusMode.enabled
-          : defaults.focusMode.enabled
       }
     };
   }

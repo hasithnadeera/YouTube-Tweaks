@@ -8,6 +8,25 @@
   let statusTimer;
   let saveQueue = Promise.resolve();
 
+  const YOUTUBE_DEFAULTS = {
+    hide_shorts: true,
+    speed_selector: true,
+    hide_actions: true,
+    center_player: true,
+    skip_sponsors: true,
+    studio_analytics_shortcut: true,
+    playback_speed: 1
+  };
+
+  const YOUTUBE_CONTROLS = [
+    ['youtube-speed-selector', 'speed_selector'],
+    ['youtube-center-player', 'center_player'],
+    ['youtube-hide-shorts', 'hide_shorts'],
+    ['youtube-hide-actions', 'hide_actions'],
+    ['youtube-skip-sponsors', 'skip_sponsors'],
+    ['youtube-analytics-shortcut', 'studio_analytics_shortcut']
+  ];
+
   function titleCasePreset(id) {
     return id === 'highContrast' ? 'High Contrast' : id.charAt(0).toUpperCase() + id.slice(1);
   }
@@ -35,25 +54,72 @@
     byId('track-color').value = transparent ? '#0f172a' : settings.scrollbar.trackColor;
     byId('track-color-label').textContent = transparent ? 'transparent' : settings.scrollbar.trackColor;
 
-    byId('selection-enabled').checked = settings.selection.enabled;
-    byId('selection-background').value = settings.selection.background;
-    byId('selection-color').value = settings.selection.color;
-    byId('focus-ring-enabled').checked = settings.focusRing.enabled;
-    byId('focus-color').value = settings.focusRing.color;
-    byId('focus-width').value = settings.focusRing.width;
-    byId('accent-enabled').checked = settings.formAccent.enabled;
-    byId('accent-color').value = settings.formAccent.color;
-    byId('motion-mode').value = settings.motion.mode;
-    byId('smooth-scroll').checked = settings.motion.smoothScroll;
-    byId('dimmer-enabled').checked = settings.dimmer.enabled;
-    byId('dimmer-amount').value = settings.dimmer.amount;
-    byId('dimmer-output').textContent = `${settings.dimmer.amount}%`;
-    byId('focus-mode-enabled').checked = settings.focusMode.enabled;
-
     document.querySelectorAll('[data-preset]').forEach((button) => {
       button.classList.toggle('active', button.dataset.preset === settings.preset);
     });
     byId('preset-status').textContent = `Preset: ${titleCasePreset(settings.preset)}`;
+  }
+
+  function renderYouTubeSettings(stored) {
+    YOUTUBE_CONTROLS.forEach(([id, key]) => {
+      byId(id).checked = typeof stored[key] === 'boolean' ? stored[key] : YOUTUBE_DEFAULTS[key];
+    });
+    const speed = Number(stored.playback_speed);
+    byId('youtube-speed-value').textContent = `${Number.isFinite(speed) ? speed : YOUTUBE_DEFAULTS.playback_speed}×`;
+  }
+
+  function bindYouTubeControls() {
+    YOUTUBE_CONTROLS.forEach(([id, key]) => {
+      byId(id).addEventListener('change', async (event) => {
+        try {
+          await chrome.storage.sync.set({ [key]: event.target.checked });
+          setStatus('YouTube setting saved');
+        } catch (error) {
+          setStatus(error.message || 'Could not save YouTube setting', true);
+        }
+      });
+    });
+
+    chrome.storage.onChanged.addListener((changes, area) => {
+      if (area !== 'sync') return;
+      YOUTUBE_CONTROLS.forEach(([id, key]) => {
+        if (changes[key]) byId(id).checked = Boolean(changes[key].newValue);
+      });
+      if (changes.playback_speed) {
+        const speed = Number(changes.playback_speed.newValue);
+        byId('youtube-speed-value').textContent = `${Number.isFinite(speed) ? speed : YOUTUBE_DEFAULTS.playback_speed}×`;
+      }
+    });
+  }
+
+  function bindSectionNavigation() {
+    const links = [...document.querySelectorAll('.side-nav a[href^="#"]')];
+    const sections = links
+      .map((link) => document.querySelector(link.getAttribute('href')))
+      .filter(Boolean);
+
+    function selectSection(id) {
+      links.forEach((link) => {
+        if (link.getAttribute('href') === `#${id}`) link.setAttribute('aria-current', 'location');
+        else link.removeAttribute('aria-current');
+      });
+    }
+
+    links.forEach((link) => {
+      link.addEventListener('click', () => selectSection(link.hash.slice(1)));
+    });
+
+    selectSection(location.hash.slice(1) || 'youtube');
+    if (!('IntersectionObserver' in window)) return;
+
+    const observer = new IntersectionObserver((entries) => {
+      const visible = entries
+        .filter((entry) => entry.isIntersecting)
+        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+      if (visible) selectSection(visible.target.id);
+    }, { rootMargin: '-18% 0px -68% 0px', threshold: [0, 0.01, 0.25] });
+
+    sections.forEach((section) => observer.observe(section));
   }
 
   function queueSave(nextSettings, message = 'Settings saved') {
@@ -129,23 +195,6 @@
     bindToggle('transparent-track', (enabled) => ({
       scrollbar: { trackColor: enabled ? 'transparent' : byId('track-color').value }
     }));
-    bindToggle('selection-enabled', (enabled) => ({ selection: { enabled } }));
-    bindValue('selection-background', 'change', (value) => ({ selection: { background: value } }));
-    bindValue('selection-color', 'change', (value) => ({ selection: { color: value } }));
-    bindToggle('focus-ring-enabled', (enabled) => ({ focusRing: { enabled } }));
-    bindValue('focus-color', 'change', (value) => ({ focusRing: { color: value } }));
-    bindValue('focus-width', 'change', (value) => ({ focusRing: { width: Number(value) } }));
-    bindToggle('accent-enabled', (enabled) => ({ formAccent: { enabled } }));
-    bindValue('accent-color', 'change', (value) => ({ formAccent: { color: value } }));
-    bindValue('motion-mode', 'change', (value) => ({ motion: { mode: value } }));
-    bindToggle('smooth-scroll', (enabled) => ({ motion: { smoothScroll: enabled } }));
-    bindToggle('dimmer-enabled', (enabled) => ({ dimmer: { enabled } }));
-    byId('dimmer-amount').addEventListener('input', (event) => {
-      byId('dimmer-output').textContent = `${event.target.value}%`;
-    });
-    bindValue('dimmer-amount', 'change', (value) => ({ dimmer: { amount: Number(value) } }));
-    bindToggle('focus-mode-enabled', (enabled) => ({ focusMode: { enabled } }));
-
     document.querySelectorAll('[data-preset]').forEach((button) => {
       button.addEventListener('click', () => queueSave(api.applyPreset(settings, button.dataset.preset), 'Preset applied'));
     });
@@ -199,7 +248,10 @@
     settings = api.normalizeSettings(stored[api.SETTINGS_KEY]);
     siteEntries = Object.fromEntries(Object.entries(stored).filter(([key]) => key.startsWith(api.SITE_PREFIX)));
     bindEvents();
+    bindYouTubeControls();
+    bindSectionNavigation();
     renderSettings();
+    renderYouTubeSettings(stored);
     renderExceptions();
   }
 

@@ -1,17 +1,25 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FlowPlay</title>
+  <link rel="stylesheet" href="shared/ui.css">
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
   <!-- ─── Overview (default) ─────────────────────────────────────── -->
   <div id="view-overview">
     <header class="header">
-      <div class="header-left">
-        <img class="logo" src="icons/icon48.png" alt="" width="20" height="20">
-        <h1>FlowPlay</h1>
-        <span class="version" id="ext-version"></span>
+      <div class="header-left brand">
+        <img class="logo" src="icons/icon48.png" alt="" width="32" height="32">
+        <div class="brand-copy">
+          <p class="eyebrow">FlowPlay</p>
+          <div class="brand-title-row">
+            <h1>YouTube controls</h1>
+            <span class="version" id="ext-version"></span>
+          </div>
+        </div>
       </div>
       <button class="header-btn" id="btn-settings" type="button" aria-label="Settings" title="Settings">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -21,7 +29,11 @@
       </button>
     </header>
 
-    <nav class="flow-nav" aria-label="Features"><span>YouTube controls</span><a href="web/popup.html">Website controls</a><a href="options/options.html" target="_blank">All web settings</a></nav>
+    <nav class="flow-nav" aria-label="FlowPlay areas">
+      <span class="active" aria-current="page">YouTube</span>
+      <a href="web/popup.html">Websites</a>
+      <a href="options/options.html" target="_blank">All settings</a>
+    </nav>
     <section class="overview">
       <div class="hero">
         <div class="hero-top">
@@ -56,7 +68,10 @@
             <path d="M10 3.5 5.5 8 10 12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </button>
-        <h1>Settings</h1>
+        <div>
+          <p class="eyebrow">YouTube</p>
+          <h1>Quick settings</h1>
+        </div>
       </div>
     </header>
 
@@ -138,6 +153,9 @@
         </label>
       </div>
     </section>
+    <footer class="settings-footer">
+      <a href="options/options.html" target="_blank">Open all FlowPlay settings</a>
+    </footer>
   </div>
 
   <script src="popup.js"></script>

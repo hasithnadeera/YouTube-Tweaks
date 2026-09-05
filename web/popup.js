@@ -11,8 +11,7 @@
 
   const ids = [
     'hostname', 'scope-badge', 'restricted-card', 'controls', 'site-enabled',
-    'scrollbar-enabled', 'scrollbar-autohide', 'dimmer-enabled', 'dimmer-amount', 'dimmer-output',
-    'focus-enabled', 'motion-mode', 'reset-site', 'open-options', 'status'
+    'scrollbar-enabled', 'scrollbar-autohide', 'reset-site', 'open-options', 'status'
   ];
 
   ids.forEach((id) => { elements[id] = document.getElementById(id); });
@@ -29,22 +28,15 @@
     elements['site-enabled'].checked = settings.enabled;
     elements['scrollbar-enabled'].checked = settings.scrollbar.enabled;
     elements['scrollbar-autohide'].checked = settings.scrollbar.autoHide;
-    elements['dimmer-enabled'].checked = settings.dimmer.enabled;
-    elements['dimmer-amount'].value = String(settings.dimmer.amount);
-    elements['dimmer-output'].textContent = `${settings.dimmer.amount}%`;
-    elements['focus-enabled'].checked = settings.focusMode.enabled;
-    elements['motion-mode'].value = settings.motion.mode;
     elements['scope-badge'].textContent = siteOverride ? 'Site override' : 'Inherited';
     elements['reset-site'].disabled = !siteOverride;
 
     const featuresDisabled = !settings.enabled;
     [
-      'scrollbar-enabled', 'scrollbar-autohide', 'dimmer-enabled', 'dimmer-amount',
-      'focus-enabled', 'motion-mode'
+      'scrollbar-enabled', 'scrollbar-autohide'
     ].forEach((id) => { elements[id].disabled = featuresDisabled; });
     if (!featuresDisabled) {
       elements['scrollbar-autohide'].disabled = !settings.scrollbar.enabled;
-      elements['dimmer-amount'].disabled = !settings.dimmer.enabled;
     }
   }
 
@@ -66,21 +58,6 @@
     });
     elements['scrollbar-autohide'].addEventListener('change', (event) => {
       saveSitePatch({ scrollbar: { autoHide: event.target.checked } }).catch(showError);
-    });
-    elements['dimmer-enabled'].addEventListener('change', (event) => {
-      saveSitePatch({ dimmer: { enabled: event.target.checked } }).catch(showError);
-    });
-    elements['dimmer-amount'].addEventListener('input', (event) => {
-      elements['dimmer-output'].textContent = `${event.target.value}%`;
-    });
-    elements['dimmer-amount'].addEventListener('change', (event) => {
-      saveSitePatch({ dimmer: { amount: Number(event.target.value) } }).catch(showError);
-    });
-    elements['focus-enabled'].addEventListener('change', (event) => {
-      saveSitePatch({ focusMode: { enabled: event.target.checked } }).catch(showError);
-    });
-    elements['motion-mode'].addEventListener('change', (event) => {
-      saveSitePatch({ motion: { mode: event.target.value } }).catch(showError);
     });
     elements['reset-site'].addEventListener('click', async () => {
       try {

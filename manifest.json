@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "FlowPlay",
   "version": "3.0.0",
-  "description": "YouTube playback, SponsorBlock and watch analytics, plus auto-hiding scrollbars, focus tools and webpage polish.",
+  "description": "YouTube playback, SponsorBlock, watch analytics, and configurable auto-hiding website scrollbars.",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",

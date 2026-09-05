@@ -1,4 +1,3 @@
-const SPONSOR_COLOR = '#00d400';
 const STATS_KEY = 'skip_stats';
 const ANALYTICS_KEY = 'analytics';
 const EMPTY_STATS = { seconds: 0, count: 0, byCategory: {}, byChannel: {} };
@@ -192,7 +191,6 @@ document.addEventListener('DOMContentLoaded', () => {
       track.className = 'bar-track';
       const fill = document.createElement('div');
       fill.className = 'bar-fill';
-      fill.style.backgroundColor = SPONSOR_COLOR;
       fill.style.width = `${Math.max(2, (row.seconds / maxSeconds) * 100)}%`;
       track.appendChild(fill);
 
