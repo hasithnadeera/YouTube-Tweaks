@@ -1,0 +1,10 @@
+{
+  "name": "flowplay",
+  "version": "3.0.0",
+  "private": true,
+  "scripts": {
+    "icons": "node tools/build-icons.js",
+    "test": "node --test tests/*.test.js",
+    "check": "node tools/check-extension.js && npm test"
+  }
+}

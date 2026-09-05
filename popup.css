@@ -1,3 +1,5 @@
+.flow-nav { display: flex; flex-wrap: wrap; gap: 12px; padding: 12px 16px; font: 12px system-ui; }
+.flow-nav a { color: #0d9488; }
 /* Themed off one set of variables so the dark override below is a short list
    rather than a second copy of the stylesheet. */
 :root {

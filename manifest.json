@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "YouTube Tweaks",
-  "version": "2.3.0",
-  "description": "Speed controls, SponsorBlock skips, UI cleanups, and local watch analytics.",
+  "name": "FlowPlay",
+  "version": "3.0.0",
+  "description": "YouTube playback, SponsorBlock and watch analytics, plus auto-hiding scrollbars, focus tools and webpage polish.",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
@@ -13,6 +13,13 @@
   },
   "content_scripts": [
     {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["shared/settings.js", "content/content.js"],
+      "css": ["content/content.css"],
+      "run_at": "document_start",
+      "all_frames": false
+    },
+    {
       "matches": ["https://www.youtube.com/*"],
       "js": ["content.js"],
       "css": ["styles.css"],
@@ -21,9 +28,10 @@
   ],
   "action": {
     "default_popup": "popup.html",
-    "default_title": "YouTube Tweaks"
+    "default_title": "FlowPlay"
   },
-  "permissions": ["storage"],
+  "options_ui": { "page": "options/options.html", "open_in_tab": true },
+  "permissions": ["storage", "activeTab"],
   "host_permissions": [
     "https://sponsor.ajay.app/*",
     "https://yt3.ggpht.com/*",

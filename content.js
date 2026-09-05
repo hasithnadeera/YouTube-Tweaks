@@ -71,12 +71,27 @@
   // YouTube's layout engine writes a fixed 2-column width onto the watch
   // container. After we hide the suggestions sidebar that width is stale and
   // overflows the viewport (horizontal scrollbar). We override it directly.
+  // `overflow-x: hidden` also makes a box with the default `overflow-y:
+  // visible` become a vertical scroll container. That leaves multiple nested
+  // scrollbars, and Helium renders those as auto-hidden overlay scrollbars.
+  // `clip` removes the horizontal overflow without changing scroll ownership.
 
   function fixCenterLayout() {
     if (!centerPlayerEnabled) return;
 
-    // Clip horizontal overflow at the document root.
-    document.documentElement.style.setProperty('overflow-x', 'hidden', 'important');
+    // Clip horizontal overflow at the document root while keeping the page's
+    // vertical scrollbar as the one scroll owner. Helium uses overlay
+    // scrollbars by default; an explicit vertical scroll mode lets the CSS
+    // scrollbar styling below request a persistent track.
+    const canClipOverflow =
+      window.CSS && typeof window.CSS.supports === 'function' &&
+      window.CSS.supports('overflow-x', 'clip');
+    document.documentElement.style.setProperty(
+      'overflow-x',
+      canClipOverflow ? 'clip' : 'hidden',
+      'important'
+    );
+    document.documentElement.style.setProperty('overflow-y', 'scroll', 'important');
 
     const flexy = document.querySelector('ytd-watch-flexy');
     if (flexy) {
@@ -98,6 +113,7 @@
 
   function clearCenterLayout() {
     document.documentElement.style.removeProperty('overflow-x');
+    document.documentElement.style.removeProperty('overflow-y');
 
     const flexy = document.querySelector('ytd-watch-flexy');
     if (flexy) {
@@ -397,12 +413,24 @@
     if (document.body) document.body.classList.toggle('ysc-studio-analytics-shortcut', on);
   }
 
+  function findMastheadEnd() {
+    return (
+      document.querySelector('ytd-masthead #end') ||
+      document.querySelector('#masthead #end') ||
+      document.querySelector('#masthead-container #end')
+    );
+  }
+
   function findMastheadButtons() {
+    const end = findMastheadEnd();
+    if (end) {
+      const buttons = end.querySelector('#buttons');
+      if (buttons) return buttons;
+    }
     return (
       document.querySelector('ytd-masthead #buttons') ||
-      document.querySelector('#masthead #buttons') ||
-      document.querySelector('ytd-masthead #end #buttons') ||
-      document.querySelector('ytd-masthead #end')
+      document.querySelector('#masthead-container #buttons') ||
+      document.querySelector('#masthead #buttons')
     );
   }
 
@@ -453,6 +481,14 @@
     return null;
   }
 
+  function findNotificationAnchor(root) {
+    return (
+      root.querySelector('ytd-notification-topbar-button-renderer') ||
+      root.querySelector('[aria-label*="Notification" i]') ||
+      root.querySelector('#notification-button')
+    );
+  }
+
   function openWatchAnalytics(e) {
     if (e) {
       e.preventDefault();
@@ -470,21 +506,59 @@
   function buildWatchAnalyticsButton() {
     const a = document.createElement('a');
     a.id = STUDIO_ANALYTICS_BTN_ID;
-    a.dataset.yscStyle = 'v4';
     a.className = 'ysc-studio-analytics-btn';
-    a.href = chrome.runtime.getURL('analytics.html');
-    a.title = 'Watch analytics';
-    a.setAttribute('aria-label', 'Watch analytics');
+    try {
+      a.href = chrome.runtime.getURL('analytics.html');
+    } catch (_) {
+      a.href = '#';
+    }
+    a.title = 'Insights';
+    a.setAttribute('aria-label', 'Insights');
     a.setAttribute('role', 'link');
+    a.dataset.yscStyle = 'v4';
 
     a.innerHTML =
       '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">' +
-      '<path fill="currentColor" d="M3 3v18h18V3H3zm16 16H5V5h14v14zM7 15h2v2H7v-2zm0-4h2v2H7v-2zm0-4h2v2H7V7zm4 8h6v2h-6v-2zm0-4h6v2h-6v-2zm0-4h6v2h-6V7z"/>' +
+      '<path fill="currentColor" d="M3.5 18.5h2.2V9.2H3.5v9.3zm5.1 0h2.2V5.5H8.6v13zm5.1 0h2.2v-6.4h-2.2v6.4zm5.1 0H21V8.1h-2.2v10.4z"/>' +
       '</svg>' +
-      '<span class="ysc-studio-analytics-label">Analytics</span>';
+      '<span class="ysc-studio-analytics-label">Insights</span>';
 
     a.addEventListener('click', openWatchAnalytics);
     return a;
+  }
+
+  function placeAnalyticsButton(btn) {
+    const end = findMastheadEnd();
+    const buttons = findMastheadButtons();
+
+    // Keep the custom link outside YouTube's managed #buttons renderer. That
+    // renderer can discard children that were not created by YouTube.
+    if (end && buttons && buttons.parentNode === end) {
+      end.insertBefore(btn, buttons);
+      return true;
+    }
+
+    if (buttons) {
+      const notification = findNotificationAnchor(buttons);
+      if (notification) {
+        const anchor =
+          notification.closest(
+            'ytd-notification-topbar-button-renderer, ytd-button-renderer, yt-button-view-model'
+          ) || notification;
+        if (buttons.contains(anchor)) {
+          buttons.insertBefore(btn, anchor);
+          return true;
+        }
+      }
+      buttons.insertBefore(btn, buttons.firstChild);
+      return true;
+    }
+
+    if (end) {
+      end.insertBefore(btn, end.firstChild);
+      return true;
+    }
+    return false;
   }
 
   function replaceCreateWithAnalytics() {
@@ -504,17 +578,20 @@
       }
     }
 
-    const existing = document.getElementById(STUDIO_ANALYTICS_BTN_ID);
-    if (existing) return;
+    const host = findMastheadEnd() || findMastheadButtons();
+    let btn = document.getElementById(STUDIO_ANALYTICS_BTN_ID);
+    const stuckInHidden = btn && btn.closest(`[${CREATE_HIDDEN_ATTR}]`);
+    const notInHost = btn && host && !host.contains(btn);
+    const needsRestyle = btn && btn.dataset.yscStyle !== 'v4';
 
-    const root = findMastheadButtons();
-    if (!root) return;
+    if (btn && (stuckInHidden || notInHost || needsRestyle)) {
+      btn.remove();
+      btn = null;
+    }
 
-    const btn = buildWatchAnalyticsButton();
-    if (create && create.parentNode) {
-      create.parentNode.insertBefore(btn, create);
-    } else {
-      root.insertBefore(btn, root.firstChild);
+    if (!btn) {
+      btn = buildWatchAnalyticsButton();
+      if (!placeAnalyticsButton(btn)) btn.remove();
     }
   }
 
@@ -531,8 +608,8 @@
     const btn = document.getElementById(STUDIO_ANALYTICS_BTN_ID);
     if (!btn || btn.dataset.yscStyle !== 'v4') return false;
     if (btn.closest(`[${CREATE_HIDDEN_ATTR}]`)) return false;
-    const host = findMastheadButtons();
-    return !!(host && host.contains(btn) && document.querySelector(`[${CREATE_HIDDEN_ATTR}]`));
+    const host = findMastheadEnd() || findMastheadButtons();
+    return !!(host && host.contains(btn));
   }
 
   // Keep re-applying: YouTube rebuilds the masthead often. Short-circuit the

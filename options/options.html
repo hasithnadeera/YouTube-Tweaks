@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FlowPlay Settings</title>
+  <link rel="stylesheet" href="../shared/ui.css">
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <main class="options-shell">
+    <header class="hero">
+      <div class="brand">
+        <img src="../icons/icon48.png" alt="">
+        <div>
+          <p class="eyebrow">FlowPlay</p>
+          <h1>Make the web feel sharper.</h1>
+          <p class="hero-copy">Minimal webpage polish with no trackers, remote code, or external dependencies.</p>
+        </div>
+      </div>
+      <label class="master-control">
+        <span>Website polish enabled</span>
+        <span class="switch"><input id="global-enabled" type="checkbox"><span></span></span>
+      </label>
+    </header>
+
+    <div class="layout">
+      <nav class="side-nav" aria-label="Settings sections"><a href="../popup.html">YouTube controls</a><a href="../analytics.html">Watch analytics</a>
+        <a href="#appearance">Appearance</a>
+        <a href="#accessibility">Accessibility</a>
+        <a href="#focus-tools">Focus tools</a>
+        <a href="#exceptions">Website exceptions</a>
+      </nav>
+
+      <div class="content-column">
+        <section id="appearance" class="card section-card">
+          <div class="section-heading">
+            <div><p class="eyebrow">Appearance</p><h2>Scrollbar</h2></div>
+            <label class="switch"><input id="scrollbar-enabled" type="checkbox"><span></span></label>
+          </div>
+
+          <div class="preset-grid" role="group" aria-label="Scrollbar presets">
+            <button type="button" data-preset="minimal"><strong>Minimal</strong><span>6px rail · transparent</span></button>
+            <button type="button" data-preset="comfortable"><strong>Comfortable</strong><span>10px rail · dark track</span></button>
+            <button type="button" data-preset="highContrast"><strong>High Contrast</strong><span>12px rail · white thumb</span></button>
+          </div>
+          <p id="preset-status" class="preset-status">Preset: Minimal</p>
+
+          <div class="setting-row scrollbar-behavior">
+            <div class="setting-copy"><label for="scrollbar-autohide">Auto-hide when idle</label><p>Show while scrolling, then hide after a short pause</p></div>
+            <label class="switch"><input id="scrollbar-autohide" type="checkbox"><span></span></label>
+          </div>
+
+          <div class="form-grid">
+            <label>Rail width <span><input id="rail-width" type="number" min="2" max="16"> px</span></label>
+            <label>Thumb width <span><input id="thumb-width" type="number" min="1" max="16"> px</span></label>
+            <label>Minimum thumb <span><input id="min-thumb" type="number" min="20" max="100"> px</span></label>
+            <label>Thumb color <input id="thumb-color" type="color"></label>
+            <label>Hover color <input id="hover-color" type="color"></label>
+            <label>Track color <span class="color-combo"><input id="track-color" type="color"><span id="track-color-label"></span></span></label>
+          </div>
+          <label class="inline-check"><input id="transparent-track" type="checkbox"> Use a transparent scrollbar track</label>
+        </section>
+
+        <section id="accessibility" class="card section-card">
+          <div class="section-heading"><div><p class="eyebrow">Accessibility</p><h2>Interaction polish</h2></div></div>
+          <div class="feature-block">
+            <div class="setting-row">
+              <div class="setting-copy"><label for="selection-enabled">Text selection</label><p>Teal selection with readable foreground</p></div>
+              <label class="switch"><input id="selection-enabled" type="checkbox"><span></span></label>
+            </div>
+            <div class="sub-controls">
+              <label>Background <input id="selection-background" type="color"></label>
+              <label>Text <input id="selection-color" type="color"></label>
+            </div>
+          </div>
+          <div class="feature-block">
+            <div class="setting-row">
+              <div class="setting-copy"><label for="focus-ring-enabled">Keyboard focus ring</label><p>Visible only for keyboard navigation</p></div>
+              <label class="switch"><input id="focus-ring-enabled" type="checkbox"><span></span></label>
+            </div>
+            <div class="sub-controls">
+              <label>Color <input id="focus-color" type="color"></label>
+              <label>Width <span><input id="focus-width" type="number" min="1" max="5"> px</span></label>
+            </div>
+          </div>
+          <div class="feature-block">
+            <div class="setting-row">
+              <div class="setting-copy"><label for="accent-enabled">Form accent</label><p>Checkboxes, radios, ranges, and progress</p></div>
+              <label class="switch"><input id="accent-enabled" type="checkbox"><span></span></label>
+            </div>
+            <div class="sub-controls"><label>Color <input id="accent-color" type="color"></label></div>
+          </div>
+          <div class="form-grid motion-grid">
+            <label>Motion preference
+              <select id="motion-mode"><option value="system">Follow operating system</option><option value="reduce">Always reduce</option><option value="normal">Allow motion</option></select>
+            </label>
+            <label class="inline-check"><input id="smooth-scroll" type="checkbox"> Enable smooth scrolling</label>
+          </div>
+        </section>
+
+        <section id="focus-tools" class="card section-card">
+          <div class="section-heading"><div><p class="eyebrow">Focus tools</p><h2>Quieter pages</h2></div></div>
+          <div class="setting-row roomy">
+            <div class="setting-copy"><label for="dimmer-enabled">Page dimmer</label><p>A click-through tint that disappears in fullscreen video</p></div>
+            <label class="switch"><input id="dimmer-enabled" type="checkbox"><span></span></label>
+          </div>
+          <div class="range-control">
+            <label for="dimmer-amount">Dim strength</label>
+            <input id="dimmer-amount" type="range" min="0" max="30" step="1">
+            <output id="dimmer-output" for="dimmer-amount">10%</output>
+          </div>
+          <div class="setting-row roomy border-top">
+            <div class="setting-copy"><label for="focus-mode-enabled">Focus Mode</label><p>Conservatively hides top-level navigation, sidebars, and footers; pages get an Exit focus pill</p></div>
+            <label class="switch"><input id="focus-mode-enabled" type="checkbox"><span></span></label>
+          </div>
+        </section>
+
+        <section id="exceptions" class="card section-card">
+          <div class="section-heading"><div><p class="eyebrow">Website exceptions</p><h2>Exact hostnames</h2><p class="section-copy">An exception for example.com does not affect www.example.com or its other subdomains.</p></div></div>
+          <form id="exception-form" class="exception-form">
+            <input id="exception-hostname" type="text" placeholder="example.com" autocomplete="off" aria-label="Hostname">
+            <button class="primary" type="submit">Disable on hostname</button>
+          </form>
+          <ul id="exception-list" class="exception-list"></ul>
+          <p id="empty-exceptions" class="empty-state">No website exceptions yet.</p>
+          <button id="clear-exceptions" class="danger" type="button">Clear all exceptions</button>
+        </section>
+
+        <section class="card section-card">
+          <h2>Transfer website settings</h2>
+          <p class="section-copy">Export from Brave Powerhouse, then import into FlowPlay to keep your website preferences.</p>
+          <button id="export-polish" type="button">Export website settings</button>
+          <label>Import website settings <input id="import-polish" type="file" accept=".json,application/json"></label>
+          <p id="transfer-status" role="status"></p>
+        </section>
+        <footer class="save-footer">
+          <div><strong>Settings save automatically</strong><p id="status" class="status-message" role="status" aria-live="polite"></p></div>
+          <button id="reset-defaults" type="button">Reset global defaults</button>
+        </footer>
+      </div>
+    </div>
+  </main>
+
+  <script src="../shared/settings.js"></script>
+  <script src="options.js"></script>
+  <script src="../shared/transfer.js"></script>
+</body>
+</html>

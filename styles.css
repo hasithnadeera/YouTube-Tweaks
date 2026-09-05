@@ -155,16 +155,45 @@ body.ysc-center-player ytd-watch-next-secondary-results-renderer {
   min-width: 0 !important;
 }
 
-/* Clip horizontal overflow at the document root (keeps vertical scroll) */
+/* Keep one document-level vertical scroller in centered-player mode. */
 html:has(body.ysc-center-player) {
-  overflow-x: hidden !important;
+  overflow-x: clip !important;
+  overflow-y: scroll !important;
+  scrollbar-gutter: stable;
 }
 
-/* Contain overflow in the watch page wrapper */
+/* Clip only the horizontal axis without creating nested vertical scrollers. */
 body.ysc-center-player ytd-watch-flexy,
 body.ysc-center-player ytd-page-manager,
 body.ysc-center-player #page-manager {
-  overflow-x: hidden !important;
+  overflow-x: clip !important;
+  overflow-y: visible !important;
+}
+
+/* Use the same slim thumb in Chromium browsers such as Brave and Helium. */
+html:not([data-bph-scrollbars="true"]):has(body.ysc-center-player)::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+html:not([data-bph-scrollbars="true"]):has(body.ysc-center-player)::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+html:not([data-bph-scrollbars="true"]):has(body.ysc-center-player)::-webkit-scrollbar-thumb {
+  min-height: 36px;
+  background: #aaa;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background-clip: content-box;
+}
+
+html:not([data-bph-scrollbars="true"]):has(body.ysc-center-player)::-webkit-scrollbar-thumb:hover {
+  background: #c4c4c4;
+}
+
+html:not([data-bph-scrollbars="true"]):has(body.ysc-center-player)::-webkit-scrollbar-corner {
+  background: transparent;
 }
 
 /* Center the primary column */
@@ -347,48 +376,50 @@ body.ysc-studio-analytics-shortcut ytd-masthead #buttons button[aria-label="Crea
 }
 
 #ysc-studio-analytics-btn.ysc-studio-analytics-btn {
-  display: inline-flex;
+  display: inline-flex !important;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   height: 36px;
+  min-width: 36px;
   padding: 0 14px;
-  margin-right: 8px;
+  margin: 0 8px 0 0;
   border-radius: 18px;
-  text-decoration: none;
+  text-decoration: none !important;
   font-family: 'Roboto', 'YouTube Sans', sans-serif;
   font-size: 14px;
   font-weight: 500;
-  color: #0f0f0f;
-  background: #f1f1f1;
-  border: none;
+  line-height: 36px;
+  color: #042f2e !important;
+  background: #5eead4 !important;
+  border: none !important;
   box-sizing: border-box;
   flex-shrink: 0;
-  transition: background 0.15s ease, opacity 0.15s ease;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative;
+  z-index: 1000;
+  cursor: pointer;
+  pointer-events: auto !important;
+  transition: background 0.15s ease, transform 0.1s ease;
 }
 
 #ysc-studio-analytics-btn.ysc-studio-analytics-btn:hover {
-  background: #e5e5e5;
+  background: #2dd4bf !important;
 }
 
-html[dark] #ysc-studio-analytics-btn.ysc-studio-analytics-btn,
-ytd-app[is-dark-theme_] #ysc-studio-analytics-btn.ysc-studio-analytics-btn,
-html[dark="true"] #ysc-studio-analytics-btn.ysc-studio-analytics-btn {
-  color: #0f0f0f;
-  background: #fff;
-}
-
-html[dark] #ysc-studio-analytics-btn.ysc-studio-analytics-btn:hover,
-ytd-app[is-dark-theme_] #ysc-studio-analytics-btn.ysc-studio-analytics-btn:hover,
-html[dark="true"] #ysc-studio-analytics-btn.ysc-studio-analytics-btn:hover {
-  background: #d9d9d9;
+#ysc-studio-analytics-btn.ysc-studio-analytics-btn:active {
+  transform: scale(0.97);
 }
 
 #ysc-studio-analytics-btn .ysc-studio-analytics-label {
   line-height: 1;
   white-space: nowrap;
+  color: inherit !important;
 }
 
 #ysc-studio-analytics-btn svg {
   display: block;
   flex-shrink: 0;
+  fill: currentColor;
 }
