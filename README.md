@@ -6,10 +6,13 @@ A YouTube-only browser extension (Manifest V3).
 
 - Playback speed selector with `[` / `]` shortcuts, remembered between videos.
 - Centered player: hides suggestions and centers the video.
+- Best quality: always plays the highest quality available.
+- Press S to save the current frame as a PNG.
+- Hide comments below the video.
 - Hide Shorts shelves and navigation entries.
 - Hide Like/Share actions while keeping Save.
 - SponsorBlock segment skipping with progress-bar markers.
-- Local watch analytics (watch time, time saved, channels, top videos) with CSV/JSON export and import.
+- Local watch analytics: weekly summary, watch time by day, a year heatmap with streaks, channel categories, history search, and time saved from sponsor skips and faster playback. CSV/JSON export and import.
 
 ## Install
 

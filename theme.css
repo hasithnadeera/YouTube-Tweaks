@@ -375,55 +375,74 @@ a:focus-visible,
   font-weight: 400;
 }
 
-/* Watch time: thin rows */
+/* Watch time: vertical bars, saved stacked on top */
 .chart {
-  display: grid;
-  height: auto;
-  gap: 10px;
+  display: flex;
+  height: 220px;
+  align-items: stretch;
+  gap: 8px;
   padding: 0;
   border: 0;
+  border-bottom: 1px solid var(--rule);
   border-radius: 0;
   background: none;
 }
 
-.track-row {
-  display: grid;
-  grid-template-columns: 44px minmax(0, 1fr) 64px;
+.chart-col {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 6px;
 }
 
-.track-label {
+.chart-value {
+  min-height: 16px;
   color: var(--muted);
-  font-size: 13px;
-}
-
-.track-value {
-  color: var(--ink-soft);
-  font-size: 13px;
-  text-align: right;
+  font-size: 11px;
+  white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
 
-.track {
+.chart-stack {
   display: flex;
-  height: 6px;
-  overflow: hidden;
-  border-radius: 999px;
-  background: var(--rule);
+  width: 100%;
+  max-width: 32px;
+  flex: 1;
+  flex-direction: column;
+  justify-content: flex-end;
 }
 
-.clip {
-  height: 100%;
-  min-width: 0;
+.chart-bar {
+  width: 100%;
+  max-width: none;
+  min-height: 0;
+  border-radius: 0;
 }
 
-.clip.watched {
+.chart-bar.watched {
+  border-radius: 0 0 0 0;
   background: var(--accent);
 }
 
-.clip.saved {
+.chart-bar.saved {
+  border-radius: 4px 4px 0 0;
   background: var(--accent-dim);
+}
+
+.chart-bar.saved[style='height: 0%;'] + .chart-bar.watched {
+  border-radius: 4px 4px 0 0;
+}
+
+.chart-label {
+  padding-bottom: 8px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.chart-col:hover .chart-value {
+  color: var(--ink);
 }
 
 .legend {
@@ -618,4 +637,152 @@ a:focus-visible,
   .switch span::after {
     transition: none;
   }
+}
+
+/* ---------- Insights ---------- */
+
+.week-summary {
+  max-width: 64ch;
+  margin: 0 0 32px;
+  color: var(--ink-soft);
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+.stat-sub {
+  margin-top: 4px;
+  color: var(--faint);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.heatmap-wrap {
+  overflow-x: auto;
+}
+
+.heatmap {
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  grid-template-rows: repeat(7, auto);
+  gap: 3px;
+  min-width: 560px;
+}
+
+.heat-cell {
+  aspect-ratio: 1;
+  border-radius: 2px;
+  background: var(--rule);
+}
+
+.heat-cell.level-1 { background: rgba(139, 156, 255, 0.28); }
+.heat-cell.level-2 { background: rgba(139, 156, 255, 0.5); }
+.heat-cell.level-3 { background: rgba(139, 156, 255, 0.75); }
+.heat-cell.level-4 { background: var(--accent); }
+
+.hbar-fill.is-unsorted {
+  background: var(--faint);
+}
+
+.category-editor {
+  margin-top: 20px;
+}
+
+.category-editor summary {
+  width: max-content;
+  color: var(--muted);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.category-editor summary:hover {
+  color: var(--ink);
+}
+
+.category-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 4px 32px;
+  margin-top: 12px;
+}
+
+.category-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.category-channel {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 10px;
+  color: var(--ink-soft);
+  font-size: 13px;
+}
+
+.category-channel span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.category-row select {
+  height: 28px;
+  padding: 0 6px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--ui-panel-2);
+  color: var(--ink-soft);
+  font-size: 12px;
+}
+
+.history-search {
+  width: 100%;
+  max-width: 420px;
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--ink);
+  font-size: 14px;
+}
+
+.history-search::placeholder {
+  color: var(--faint);
+}
+
+.search-results {
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.search-results li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.result-title {
+  overflow: hidden;
+  color: var(--ink-soft);
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.result-title:hover {
+  color: var(--accent);
+}
+
+.result-meta {
+  color: var(--faint);
+  font-size: 12px;
 }

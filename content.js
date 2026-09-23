@@ -53,6 +53,7 @@
   let centerPlayerEnabled = true;
   let skipSponsorsEnabled = true;
   let studioAnalyticsShortcutEnabled = true;
+  let frameScreenshotEnabled = true;
   let sponsorStateReady = false;
 
   const STUDIO_ANALYTICS_BTN_ID = 'ysc-studio-analytics-btn';
@@ -137,6 +138,10 @@
   function applyToggles(settings) {
     if (settings.hide_shorts !== undefined) document.body.classList.toggle('ysc-hide-shorts', settings.hide_shorts);
     if (settings.hide_actions !== undefined) document.body.classList.toggle('ysc-hide-actions', settings.hide_actions);
+    if (settings.hide_comments !== undefined) document.body.classList.toggle('ysc-hide-comments', settings.hide_comments);
+    if (settings.frame_screenshot !== undefined) frameScreenshotEnabled = settings.frame_screenshot;
+    // Read by page/quality.js, which runs in the page and can reach the player API.
+    if (settings.max_quality !== undefined) document.documentElement.dataset.ttMaxQuality = settings.max_quality ? 'true' : 'false';
     if (settings.center_player !== undefined) {
       centerPlayerEnabled = settings.center_player;
       if (centerPlayerEnabled) {
@@ -201,6 +206,9 @@
     center_player: true,
     skip_sponsors: true,
     studio_analytics_shortcut: true,
+    hide_comments: true,
+    max_quality: true,
+    frame_screenshot: true,
     retention_days: RETENTION_DAYS_DEFAULT,
     playback_speed: 1
   };
@@ -408,6 +416,51 @@
 
     e.preventDefault();
     e.stopPropagation();
+  }, true);
+
+  // ─── Frame screenshot (S) ────────────────────────────────────────
+
+  function formatClock(seconds) {
+    const total = Math.max(0, Math.floor(seconds));
+    const h = Math.floor(total / 3600);
+    const m = Math.floor((total % 3600) / 60);
+    const sec = String(total % 60).padStart(2, '0');
+    return h ? `${h}-${String(m).padStart(2, '0')}-${sec}` : `${m}-${sec}`;
+  }
+
+  function saveFrame() {
+    const video = getVideo();
+    if (!video || !video.videoWidth) return;
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    try {
+      canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+    } catch (_) {
+      return;
+    }
+    const title = (getCurrentVideoTitle() || 'YouTube').replace(/[\\/:*?"<>|]+/g, ' ').trim().slice(0, 80);
+    canvas.toBlob((blob) => {
+      if (!blob) return;
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${title} ${formatClock(video.currentTime)}.png`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }, 'image/png');
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (!started || !frameScreenshotEnabled || !isOnVideoPage()) return;
+    if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return;
+    if (isTypingTarget(e.target) || isTypingTarget(document.activeElement)) return;
+    if (e.key !== 's' && e.key !== 'S') return;
+    e.preventDefault();
+    e.stopPropagation();
+    saveFrame();
   }, true);
 
   // ─── Insights shortcut (replaces Create) ─────────────────────────
@@ -1208,6 +1261,7 @@
 
   let watchLastTs = 0;
   let watchPendingSeconds = 0;
+  let watchPendingSpeedSaved = 0;
   let watchPendingQuality = {};
   let watchPendingDayKey = null;
   const watchRetryBatches = [];
@@ -1255,6 +1309,7 @@
   function flushWatchTime() {
     const batches = watchRetryBatches.splice(0);
     const seconds = watchPendingSeconds;
+    const speedSaved = watchPendingSpeedSaved;
     const quality = watchPendingQuality;
     const dayKey = watchPendingDayKey || todayKey();
     const channel = getChannelInfo();
@@ -1262,11 +1317,12 @@
     const title = getCurrentVideoTitle();
 
     watchPendingSeconds = 0;
+    watchPendingSpeedSaved = 0;
     watchPendingQuality = {};
     watchPendingDayKey = null;
 
     if (seconds >= 0.5) {
-      batches.push({ seconds, quality, dayKey, channel, videoId, title });
+      batches.push({ seconds, speedSaved, quality, dayKey, channel, videoId, title });
     }
     if (!batches.length) return;
 
@@ -1274,11 +1330,13 @@
       batches.forEach((batch) => {
         const day = ensureDay(analytics.days, batch.dayKey);
         day.watched = (day.watched || 0) + batch.seconds;
+        day.speedSaved = (day.speedSaved || 0) + (batch.speedSaved || 0);
         addQuality(day, batch.quality);
 
         if (batch.channel && batch.channel.id) {
           const ch = ensureDayChannel(day, batch.channel.id, batch.channel);
           ch.watched = (ch.watched || 0) + batch.seconds;
+          ch.speedSaved = (ch.speedSaved || 0) + (batch.speedSaved || 0);
           addQuality(ch, batch.quality);
           const video = touchVideo(ch, batch.videoId, batch.title);
           if (video) video.watched = (video.watched || 0) + batch.seconds;
@@ -1316,6 +1374,10 @@
         if (!watchPendingDayKey) watchPendingDayKey = key;
 
         watchPendingSeconds += delta;
+        // Real seconds spent at a rate above 1x cover more video; the extra
+        // is time the viewer saved by watching faster.
+        const rate = getVideo() ? getVideo().playbackRate : 1;
+        if (rate > 1) watchPendingSpeedSaved += delta * (rate - 1);
         const quality = currentQualityKey();
         if (quality) {
           watchPendingQuality[quality] = (watchPendingQuality[quality] || 0) + delta;

@@ -36,14 +36,18 @@
       <div class="controls-list">
         <div class="setting-row"><div class="setting-copy"><span class="label">Speed selector</span><p>Now <span id="youtube-speed-value">1×</span>. Press [ or ] to change.</p></div><label class="switch"><input id="youtube-speed-selector" type="checkbox"><span></span></label></div>
         <div class="setting-row"><div class="setting-copy"><span class="label">Center player</span><p>Hide suggestions and center the video</p></div><label class="switch"><input id="youtube-center-player" type="checkbox"><span></span></label></div>
+        <div class="setting-row"><div class="setting-copy"><span class="label">Best quality</span><p>Always play the highest quality available</p></div><label class="switch"><input id="youtube-max-quality" type="checkbox"><span></span></label></div>
+        <div class="setting-row"><div class="setting-copy"><span class="label">Frame screenshot</span><p>Press S to save the current frame as a picture</p></div><label class="switch"><input id="youtube-frame-screenshot" type="checkbox"><span></span></label></div>
         <div class="setting-row"><div class="setting-copy"><span class="label">Hide Shorts</span><p>Remove Shorts shelves and navigation entries</p></div><label class="switch"><input id="youtube-hide-shorts" type="checkbox"><span></span></label></div>
         <div class="setting-row"><div class="setting-copy"><span class="label">Hide actions</span><p>Remove Like and Share while keeping Save</p></div><label class="switch"><input id="youtube-hide-actions" type="checkbox"><span></span></label></div>
+        <div class="setting-row"><div class="setting-copy"><span class="label">Hide comments</span><p>Remove the comments below the video</p></div><label class="switch"><input id="youtube-hide-comments" type="checkbox"><span></span></label></div>
         <div class="setting-row"><div class="setting-copy"><span class="label">Skip sponsors</span><p>Automatically skip community-flagged segments</p></div><label class="switch"><input id="youtube-skip-sponsors" type="checkbox"><span></span></label></div>
         <div class="setting-row"><div class="setting-copy"><span class="label">Analytics shortcut</span><p>Replace YouTube Create with this page</p></div><label class="switch"><input id="youtube-analytics-shortcut" type="checkbox"><span></span></label></div>
       </div>
     </aside>
 
     <main class="desk-log">
+    <p class="week-summary" id="week-summary"></p>
     <p class="banner" id="write-banner" hidden></p>
 
     <section class="filter-card" aria-label="Analytics filters">
@@ -79,6 +83,7 @@
       <div class="stat-card">
         <div class="stat-label">Time saved</div>
         <div class="stat-value accent" id="stat-saved">0s</div>
+        <div class="stat-sub" id="stat-saved-sub"></div>
       </div>
       <div class="stat-card">
         <div class="stat-label">Videos</div>
@@ -106,6 +111,14 @@
       </div>
     </section>
 
+    <section class="card" aria-labelledby="year-title">
+      <div class="card-head">
+        <h2 id="year-title">Your year</h2>
+        <span class="card-hint" id="streak-text"></span>
+      </div>
+      <div class="heatmap-wrap"><div class="heatmap" id="heatmap" role="img" aria-label="Watch time for each day of the past year"></div></div>
+    </section>
+
     <div class="split">
       <section class="card">
         <div class="card-head"><h2>Watch time by channel</h2></div>
@@ -119,6 +132,18 @@
         </div>
       </section>
     </div>
+
+    <section class="card" aria-labelledby="category-title">
+      <div class="card-head">
+        <h2 id="category-title">Categories</h2>
+        <span class="card-hint">In this range</span>
+      </div>
+      <div class="hbar-list" id="category-bars"></div>
+      <details class="category-editor">
+        <summary>Sort channels into categories</summary>
+        <div class="category-list" id="category-list"></div>
+      </details>
+    </section>
 
     <section class="card">
       <div class="card-head"><h2>Channel breakdown</h2></div>
@@ -164,11 +189,19 @@
       </div>
       <p class="empty" id="video-table-empty" hidden>No videos recorded in this range yet.</p>
     </section>
+
+    <section class="card" aria-labelledby="search-title">
+      <div class="card-head"><h2 id="search-title">Search history</h2></div>
+      <input class="history-search" id="history-search" type="search" placeholder="Search by video title or channel" autocomplete="off">
+      <ul class="search-results" id="search-results"></ul>
+      <p class="empty" id="search-empty" hidden></p>
+    </section>
     </main>
     </div>
   </div>
 
   <script src="settings.js"></script>
   <script src="analytics.js"></script>
+  <script src="insights.js"></script>
 </body>
 </html>

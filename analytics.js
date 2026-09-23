@@ -171,6 +171,7 @@ function channelVideos(ch) {
 function aggregateRange(days, keys) {
   let watched = 0;
   let skipped = 0;
+  let speedSaved = 0;
   let skipCount = 0;
   const channels = {};
   const videos = {};
@@ -182,6 +183,7 @@ function aggregateRange(days, keys) {
     if (!day || typeof day !== 'object') return;
     watched += day.watched || 0;
     skipped += day.skipped || 0;
+    speedSaved += day.speedSaved || 0;
     skipCount += day.skipCount || 0;
     mergeQuality(byQuality, day.byQuality);
 
@@ -241,6 +243,7 @@ function aggregateRange(days, keys) {
   return {
     watched,
     skipped,
+    speedSaved,
     skipCount,
     channels,
     videos,
@@ -258,7 +261,7 @@ function seriesForKeys(days, keys, range) {
     return [{
       label: 'Today',
       watched: (day.watched || 0) / 3600,
-      saved: (day.skipped || 0) / 3600
+      saved: ((day.skipped || 0) + (day.speedSaved || 0)) / 3600
     }];
   }
 
@@ -275,7 +278,7 @@ function seriesForKeys(days, keys, range) {
         const day = days[k];
         if (!day) return;
         watched += day.watched || 0;
-        saved += day.skipped || 0;
+        saved += (day.skipped || 0) + (day.speedSaved || 0);
       });
       chunks.push({
         label: `W${chunks.length + 1}`,
@@ -291,7 +294,7 @@ function seriesForKeys(days, keys, range) {
     return {
       label: range === 'week' ? weekdayLabel(key) : shortLabel(key, range),
       watched: (day.watched || 0) / 3600,
-      saved: (day.skipped || 0) / 3600
+      saved: ((day.skipped || 0) + (day.speedSaved || 0)) / 3600
     };
   });
 }
@@ -345,8 +348,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return keysBetween(dateFrom.value || todayKey(), dateTo.value || todayKey());
   }
 
-  // Track view: one horizontal track per period, watch time drawn as a clip
-  // and time saved as an amber tail, like clips on an editing timeline.
+  // Vertical bars: watched, with the time saved stacked on top.
   function renderTrend(series) {
     trendChart.replaceChildren();
     const peak = Math.max(0, ...series.map((p) => p.watched + p.saved));
@@ -354,34 +356,33 @@ document.addEventListener('DOMContentLoaded', () => {
     const pct = (value) => `${Math.min(100, Math.max(0, (value / max) * 100))}%`;
 
     series.forEach((point) => {
-      const row = document.createElement('div');
-      row.className = 'track-row';
-
-      const label = document.createElement('span');
-      label.className = 'track-label';
-      label.textContent = point.label;
-
-      const track = document.createElement('div');
-      track.className = 'track';
-
-      const clip = document.createElement('div');
-      clip.className = 'clip watched';
-      clip.style.width = pct(point.watched);
-      clip.title = `${point.label}: ${formatDuration(point.watched * 3600)} watched`;
-
-      const saved = document.createElement('div');
-      saved.className = 'clip saved';
-      saved.style.width = pct(point.saved);
-      saved.title = `${point.label}: ${formatDuration(point.saved * 3600)} saved`;
-
-      track.append(clip, saved);
+      const col = document.createElement('div');
+      col.className = 'chart-col';
+      col.title = `${point.label}: ${formatDuration(point.watched * 3600)} watched, ${formatDuration(point.saved * 3600)} saved`;
 
       const value = document.createElement('span');
-      value.className = 'track-value';
-      value.textContent = point.watched > 0 ? formatDuration(point.watched * 3600) : '–';
+      value.className = 'chart-value';
+      value.textContent = point.watched > 0 ? formatDuration(point.watched * 3600) : '';
 
-      row.append(label, track, value);
-      trendChart.appendChild(row);
+      const stack = document.createElement('div');
+      stack.className = 'chart-stack';
+
+      const saved = document.createElement('div');
+      saved.className = 'chart-bar saved';
+      saved.style.height = pct(point.saved);
+
+      const watched = document.createElement('div');
+      watched.className = 'chart-bar watched';
+      watched.style.height = pct(point.watched);
+
+      stack.append(saved, watched);
+
+      const label = document.createElement('span');
+      label.className = 'chart-label';
+      label.textContent = point.label;
+
+      col.append(value, stack, label);
+      trendChart.appendChild(col);
     });
   }
 
@@ -571,7 +572,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const agg = aggregateRange(days, keys);
 
     statWatched.textContent = formatDuration(agg.watched);
-    statSaved.textContent = formatDuration(agg.skipped);
+    statSaved.textContent = formatDuration(agg.skipped + agg.speedSaved);
+    const savedParts = [];
+    if (agg.skipped >= 1) savedParts.push(`${formatDuration(agg.skipped)} skipping sponsors`);
+    if (agg.speedSaved >= 1) savedParts.push(`${formatDuration(agg.speedSaved)} watching faster`);
+    document.getElementById('stat-saved-sub').textContent = savedParts.join(', ');
     statVideos.textContent = String(agg.videoCount);
     statChannels.textContent = String(agg.channelCount);
     statData.textContent = formatMegabytes(agg.estimatedMb);
@@ -588,6 +593,8 @@ document.addEventListener('DOMContentLoaded', () => {
     renderVideos(agg.videos);
     lastAggregate = agg;
     lastKeys = keys;
+    // insights.js draws the year, categories and search from the same data.
+    document.dispatchEvent(new CustomEvent('tubetune:render', { detail: { days, keys } }));
   }
 
   // ─── Top videos ──────────────────────────────────────────────────

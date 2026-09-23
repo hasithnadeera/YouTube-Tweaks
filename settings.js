@@ -11,14 +11,20 @@
     center_player: true,
     skip_sponsors: true,
     studio_analytics_shortcut: true,
+    max_quality: true,
+    hide_comments: true,
+    frame_screenshot: true,
     playback_speed: 1
   };
 
   const YOUTUBE_CONTROLS = [
     ['youtube-speed-selector', 'speed_selector'],
     ['youtube-center-player', 'center_player'],
+    ['youtube-max-quality', 'max_quality'],
+    ['youtube-frame-screenshot', 'frame_screenshot'],
     ['youtube-hide-shorts', 'hide_shorts'],
     ['youtube-hide-actions', 'hide_actions'],
+    ['youtube-hide-comments', 'hide_comments'],
     ['youtube-skip-sponsors', 'skip_sponsors'],
     ['youtube-analytics-shortcut', 'studio_analytics_shortcut']
   ];

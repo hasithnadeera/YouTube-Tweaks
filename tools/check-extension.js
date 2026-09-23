@@ -9,7 +9,7 @@ assert.equal(manifest.manifest_version, 3);
 assert.equal(manifest.name, 'TubeTune');
 assert.equal(manifest.version, JSON.parse(fs.readFileSync(path.join(root, 'package.json'))).version);
 assert.deepEqual(manifest.permissions, ['storage']);
-assert.equal(manifest.content_scripts.length, 2);
+assert.equal(manifest.content_scripts.length, 3);
 assert.deepEqual(manifest.content_scripts[1].matches, ['https://www.youtube.com/*']);
 const refs = [manifest.options_ui.page, manifest.background.service_worker,
   ...Object.values(manifest.icons), ...manifest.content_scripts.flatMap(s => [...(s.js || []), ...(s.css || [])])];

@@ -37,6 +37,16 @@
         "styles.css"
       ],
       "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://www.youtube.com/*"
+      ],
+      "js": [
+        "page/quality.js"
+      ],
+      "run_at": "document_idle",
+      "world": "MAIN"
     }
   ],
   "action": {

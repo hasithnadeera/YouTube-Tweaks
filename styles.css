@@ -398,3 +398,9 @@ body.ysc-studio-analytics-shortcut ytd-masthead #buttons button[aria-label="Crea
   flex-shrink: 0;
   fill: currentColor;
 }
+
+/* Hide comments under the video */
+body.ysc-hide-comments ytd-comments#comments,
+body.ysc-hide-comments #comments.ytd-watch-flexy {
+  display: none !important;
+}
