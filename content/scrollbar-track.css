@@ -1,4 +1,14 @@
-/* Hide the scrollbar's background track on every site; keep a slim thumb. */
+/* The page's own scrollbar takes up width; hide it and draw an overlay
+   thumb instead (see overlay-scrollbar.js). */
+html {
+  scrollbar-width: none !important;
+}
+
+html::-webkit-scrollbar {
+  display: none !important;
+}
+
+/* Inner scrolling boxes keep a slim scrollbar with no track background. */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -24,4 +34,30 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #b0b0b0;
   background-clip: content-box;
+}
+
+#tubetune-overlay-thumb {
+  position: fixed !important;
+  top: 0;
+  right: 2px !important;
+  width: 6px !important;
+  min-height: 32px;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 6px !important;
+  background: rgba(138, 138, 138, 0.85) !important;
+  z-index: 2147483647 !important;
+  cursor: default;
+  transition: width 0.12s ease, background-color 0.12s ease;
+}
+
+#tubetune-overlay-thumb:hover,
+#tubetune-overlay-thumb.tt-dragging {
+  width: 9px !important;
+  background: rgba(176, 176, 176, 0.95) !important;
+}
+
+#tubetune-overlay-thumb[hidden] {
+  display: none !important;
 }
