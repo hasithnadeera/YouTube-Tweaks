@@ -13,6 +13,7 @@
     studio_analytics_shortcut: true,
     max_quality: true,
     hide_comments: true,
+    hide_notifications: true,
     compact_description: true,
     frame_screenshot: true,
     playback_speed: 1
@@ -26,6 +27,7 @@
     ['youtube-hide-shorts', 'hide_shorts'],
     ['youtube-hide-actions', 'hide_actions'],
     ['youtube-hide-comments', 'hide_comments'],
+    ['youtube-hide-notifications', 'hide_notifications'],
     ['youtube-compact-description', 'compact_description'],
     ['youtube-skip-sponsors', 'skip_sponsors'],
     ['youtube-analytics-shortcut', 'studio_analytics_shortcut']

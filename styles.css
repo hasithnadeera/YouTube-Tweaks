@@ -456,3 +456,11 @@ body.ysc-compact-desc.ysc-desc-open ytd-watch-metadata #description {
 body.ysc-compact-desc ytd-watch-metadata #description #info-container {
   display: none !important;
 }
+
+/* Hide the notification bell in the top bar */
+body.ysc-hide-notifications ytd-masthead ytd-notification-topbar-button-renderer,
+body.ysc-hide-notifications ytd-masthead #notification-button,
+body.ysc-hide-notifications ytd-masthead #buttons > *:has(> * button[aria-label*="Notification" i]),
+body.ysc-hide-notifications ytd-masthead #buttons > *:has(button[aria-label*="Notification" i]) {
+  display: none !important;
+}

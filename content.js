@@ -140,6 +140,7 @@
     if (settings.hide_shorts !== undefined) document.body.classList.toggle('ysc-hide-shorts', settings.hide_shorts);
     if (settings.hide_actions !== undefined) document.body.classList.toggle('ysc-hide-actions', settings.hide_actions);
     if (settings.hide_comments !== undefined) document.body.classList.toggle('ysc-hide-comments', settings.hide_comments);
+    if (settings.hide_notifications !== undefined) document.body.classList.toggle('ysc-hide-notifications', settings.hide_notifications);
     if (settings.frame_screenshot !== undefined) frameScreenshotEnabled = settings.frame_screenshot;
     if (settings.compact_description !== undefined) {
       compactDescriptionEnabled = settings.compact_description;
@@ -214,6 +215,7 @@
     skip_sponsors: true,
     studio_analytics_shortcut: true,
     hide_comments: true,
+    hide_notifications: true,
     compact_description: true,
     max_quality: true,
     frame_screenshot: true,
