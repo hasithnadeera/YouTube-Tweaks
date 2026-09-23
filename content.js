@@ -54,6 +54,7 @@
   let skipSponsorsEnabled = true;
   let studioAnalyticsShortcutEnabled = true;
   let frameScreenshotEnabled = true;
+  let compactDescriptionEnabled = true;
   let sponsorStateReady = false;
 
   const STUDIO_ANALYTICS_BTN_ID = 'ysc-studio-analytics-btn';
@@ -140,6 +141,12 @@
     if (settings.hide_actions !== undefined) document.body.classList.toggle('ysc-hide-actions', settings.hide_actions);
     if (settings.hide_comments !== undefined) document.body.classList.toggle('ysc-hide-comments', settings.hide_comments);
     if (settings.frame_screenshot !== undefined) frameScreenshotEnabled = settings.frame_screenshot;
+    if (settings.compact_description !== undefined) {
+      compactDescriptionEnabled = settings.compact_description;
+      document.body.classList.toggle('ysc-compact-desc', compactDescriptionEnabled);
+      if (compactDescriptionEnabled) syncInfoChip();
+      else removeInfoChip();
+    }
     // Read by page/quality.js, which runs in the page and can reach the player API.
     if (settings.max_quality !== undefined) document.documentElement.dataset.ttMaxQuality = settings.max_quality ? 'true' : 'false';
     if (settings.center_player !== undefined) {
@@ -207,6 +214,7 @@
     skip_sponsors: true,
     studio_analytics_shortcut: true,
     hide_comments: true,
+    compact_description: true,
     max_quality: true,
     frame_screenshot: true,
     retention_days: RETENTION_DAYS_DEFAULT,
@@ -417,6 +425,81 @@
     e.preventDefault();
     e.stopPropagation();
   }, true);
+
+  // ─── Compact description ────────────────────────────────────────
+  // Views and upload date move into a small label next to Save. The
+  // description box is hidden and pops open while that label (or the open
+  // box itself) is hovered.
+
+  const INFO_CHIP_ID = 'ysc-info-chip';
+  let descCloseTimer = null;
+
+  function readViewsAndDate() {
+    const root = document.querySelector('ytd-watch-metadata ytd-watch-info-text');
+    if (!root) return '';
+    const info = root.querySelector('#info');
+    const spans = info
+      ? [...info.children].filter((el) => el.tagName === 'SPAN').map((el) => el.textContent.trim()).filter(Boolean)
+      : [];
+    if (spans.length >= 2 && /\d/.test(spans[0])) return `${spans[0]}  ${spans[1]}`;
+    // Some layouts only expose these as labels on the animated counters.
+    const label = (id) => {
+      const el = root.querySelector(`#${id}`);
+      return el ? (el.getAttribute('aria-label') || el.textContent).replace(/\s+/g, ' ').trim() : '';
+    };
+    return [label('view-count'), label('date-text')].filter(Boolean).join('  ');
+  }
+
+  function openDescription() {
+    clearTimeout(descCloseTimer);
+    document.body.classList.add('ysc-desc-open');
+  }
+
+  function closeDescriptionSoon() {
+    clearTimeout(descCloseTimer);
+    descCloseTimer = setTimeout(() => document.body.classList.remove('ysc-desc-open'), 200);
+  }
+
+  function bindDescriptionHover() {
+    const box = document.querySelector('ytd-watch-metadata #description');
+    if (!box || box.dataset.yscHover) return;
+    box.dataset.yscHover = 'true';
+    box.addEventListener('mouseenter', openDescription);
+    box.addEventListener('mouseleave', closeDescriptionSoon);
+  }
+
+  function syncInfoChip() {
+    if (!compactDescriptionEnabled || !isOnVideoPage()) {
+      removeInfoChip();
+      return;
+    }
+    const actions = document.querySelector('ytd-watch-metadata #actions');
+    const text = readViewsAndDate();
+    if (!actions || !text) return;
+
+    let chip = document.getElementById(INFO_CHIP_ID);
+    if (!chip || chip.parentElement !== actions) {
+      if (chip) chip.remove();
+      chip = document.createElement('div');
+      chip.id = INFO_CHIP_ID;
+      chip.tabIndex = 0;
+      chip.setAttribute('role', 'button');
+      chip.setAttribute('aria-label', 'Show description');
+      chip.addEventListener('mouseenter', openDescription);
+      chip.addEventListener('mouseleave', closeDescriptionSoon);
+      chip.addEventListener('focus', openDescription);
+      chip.addEventListener('blur', closeDescriptionSoon);
+      actions.prepend(chip);
+    }
+    if (chip.textContent !== text) chip.textContent = text;
+    bindDescriptionHover();
+  }
+
+  function removeInfoChip() {
+    const chip = document.getElementById(INFO_CHIP_ID);
+    if (chip) chip.remove();
+    document.body.classList.remove('ysc-desc-open');
+  }
 
   // ─── Frame screenshot (S) ────────────────────────────────────────
 
@@ -690,6 +773,7 @@
         renderSegmentMarkers();
       }
       if (centerPlayerEnabled && isOnVideoPage()) fixCenterLayout();
+      if (compactDescriptionEnabled) syncInfoChip();
       if (started && studioAnalyticsShortcutEnabled && !analyticsShortcutSettled()) {
         replaceCreateWithAnalytics();
       }
@@ -718,6 +802,7 @@
     setTimeout(() => {
       if (speedSelectorEnabled) injectController();
       if (centerPlayerEnabled && isOnVideoPage()) fixCenterLayout();
+      if (compactDescriptionEnabled) syncInfoChip();
       if (started && studioAnalyticsShortcutEnabled) replaceCreateWithAnalytics();
     }, 800);
   });
