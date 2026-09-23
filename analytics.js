@@ -4,7 +4,7 @@ const EMPTY_ANALYTICS = { days: {} };
 const EMPTY_STATS = { seconds: 0, count: 0, byCategory: {}, byChannel: {} };
 const WRITE_ERROR_KEY = 'analytics_write_error';
 const SCHEMA_VERSION = 2;
-const PIE_COLORS = ['#8ea2ff', '#ffb020', '#5fc7c0', '#c49bff', '#ff7a6b', '#a3b1c6', '#6b7fd6', '#5f6677'];
+const PIE_COLORS = ['#8b9cff', '#6f7ccc', '#5a6399', '#9aa0ad', '#747a87', '#565b66', '#43474f', '#34373d'];
 const MAX_RANGE_DAYS = 366;
 const RETENTION_DEFAULT = 180;
 
@@ -57,13 +57,6 @@ function formatDuration(totalSeconds) {
   if (hours) return `${hours}h ${minutes}m`;
   if (minutes) return `${minutes}m ${seconds % 60}s`;
   return `${seconds}s`;
-}
-
-// Editor-style timecode, e.g. 01:19:04. Used for the headline readout.
-function formatTimecode(totalSeconds) {
-  const seconds = Math.max(0, Math.round(totalSeconds));
-  const pad = (n) => String(n).padStart(2, '0');
-  return `${pad(Math.floor(seconds / 3600))}:${pad(Math.floor((seconds % 3600) / 60))}:${pad(seconds % 60)}`;
 }
 
 function initialLetter(name) {
@@ -360,24 +353,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const max = peak > 0 ? peak : 1;
     const pct = (value) => `${Math.min(100, Math.max(0, (value / max) * 100))}%`;
 
-    const ruler = document.createElement('div');
-    ruler.className = 'track-ruler';
-    ruler.setAttribute('aria-hidden', 'true');
-    [0, 0.25, 0.5, 0.75, 1].forEach((f) => {
-      const tick = document.createElement('span');
-      tick.style.left = `${f * 100}%`;
-      tick.textContent = peak > 0 ? formatDuration(max * f * 3600) : '';
-      ruler.appendChild(tick);
-    });
-    const rulerRow = document.createElement('div');
-    rulerRow.className = 'track-row track-row-ruler';
-    rulerRow.append(document.createElement('span'), ruler, document.createElement('span'));
-    trendChart.appendChild(rulerRow);
-
-    series.forEach((point, index) => {
+    series.forEach((point) => {
       const row = document.createElement('div');
       row.className = 'track-row';
-      if (index === series.length - 1) row.classList.add('is-latest');
 
       const label = document.createElement('span');
       label.className = 'track-label';
@@ -592,10 +570,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const days = analytics.days || {};
     const agg = aggregateRange(days, keys);
 
-    statWatched.textContent = formatTimecode(agg.watched);
-    statWatched.title = formatDuration(agg.watched);
-    statSaved.textContent = `−${formatTimecode(agg.skipped)}`;
-    statSaved.title = formatDuration(agg.skipped);
+    statWatched.textContent = formatDuration(agg.watched);
+    statSaved.textContent = formatDuration(agg.skipped);
     statVideos.textContent = String(agg.videoCount);
     statChannels.textContent = String(agg.channelCount);
     statData.textContent = formatMegabytes(agg.estimatedMb);
