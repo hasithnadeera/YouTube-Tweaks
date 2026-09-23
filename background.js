@@ -66,3 +66,15 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   sendResponse({ ok: false, error: `Unknown message type: ${message.type}` });
   return false;
 });
+
+// The toolbar button opens the single TubeTune page (or focuses it if open).
+chrome.action.onClicked.addListener(async () => {
+  const url = chrome.runtime.getURL('analytics.html');
+  const [tab] = await chrome.tabs.query({ url });
+  if (tab) {
+    await chrome.tabs.update(tab.id, { active: true });
+    await chrome.windows.update(tab.windowId, { focused: true });
+  } else {
+    await chrome.tabs.create({ url });
+  }
+});

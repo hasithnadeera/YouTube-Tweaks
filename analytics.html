@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>TubeTune — Analytics</title>
+  <title>TubeTune</title>
   <link rel="stylesheet" href="shared/ui.css">
   <link rel="stylesheet" href="analytics.css">
 </head>
@@ -19,11 +19,6 @@
             <p class="subtitle">Your viewing time, sponsor skips, and channel activity in one place.</p>
           </div>
         </div>
-        <nav class="page-nav" aria-label="TubeTune areas">
-          <a href="popup.html">YouTube controls</a>
-          <span aria-current="page">Analytics</span>
-          <a href="options/options.html">All settings</a>
-        </nav>
       </div>
       <div class="header-actions">
         <button class="ghost-btn" id="btn-export-csv" type="button">Export CSV</button>
@@ -35,6 +30,18 @@
         <button class="ghost-btn danger" id="btn-reset" type="button">Reset all</button>
       </div>
     </header>
+
+    <section class="card controls-card" aria-labelledby="controls-title">
+      <div class="card-head"><h2 id="controls-title">YouTube controls</h2><span class="card-hint" id="status" role="status" aria-live="polite"></span></div>
+      <div class="controls-grid">
+        <div class="setting-row"><div class="setting-copy"><span class="label">Speed selector</span><p>Current speed: <span id="youtube-speed-value">1×</span> · use [ and ] to step</p></div><label class="switch"><input id="youtube-speed-selector" type="checkbox"><span></span></label></div>
+        <div class="setting-row"><div class="setting-copy"><span class="label">Center player</span><p>Hide suggestions and center the video</p></div><label class="switch"><input id="youtube-center-player" type="checkbox"><span></span></label></div>
+        <div class="setting-row"><div class="setting-copy"><span class="label">Hide Shorts</span><p>Remove Shorts shelves and navigation entries</p></div><label class="switch"><input id="youtube-hide-shorts" type="checkbox"><span></span></label></div>
+        <div class="setting-row"><div class="setting-copy"><span class="label">Hide actions</span><p>Remove Like and Share while keeping Save</p></div><label class="switch"><input id="youtube-hide-actions" type="checkbox"><span></span></label></div>
+        <div class="setting-row"><div class="setting-copy"><span class="label">Skip sponsors</span><p>Automatically skip community-flagged segments</p></div><label class="switch"><input id="youtube-skip-sponsors" type="checkbox"><span></span></label></div>
+        <div class="setting-row"><div class="setting-copy"><span class="label">Analytics shortcut</span><p>Replace YouTube Create with this page</p></div><label class="switch"><input id="youtube-analytics-shortcut" type="checkbox"><span></span></label></div>
+      </div>
+    </section>
 
     <p class="banner" id="write-banner" hidden></p>
 
@@ -158,6 +165,7 @@
     </section>
   </div>
 
+  <script src="settings.js"></script>
   <script src="analytics.js"></script>
 </body>
 </html>

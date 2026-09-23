@@ -11,7 +11,7 @@ assert.equal(manifest.version, JSON.parse(fs.readFileSync(path.join(root, 'packa
 assert.deepEqual(manifest.permissions, ['storage']);
 assert.equal(manifest.content_scripts.length, 1);
 assert.deepEqual(manifest.content_scripts[0].matches, ['https://www.youtube.com/*']);
-const refs = [manifest.action.default_popup, manifest.options_ui.page, manifest.background.service_worker,
+const refs = [manifest.options_ui.page, manifest.background.service_worker,
   ...Object.values(manifest.icons), ...manifest.content_scripts.flatMap(s => [...(s.js || []), ...(s.css || [])])];
 refs.forEach(p => assert(fs.existsSync(path.join(root, p)), 'Missing: ' + p));
 function walk(dir) {

@@ -779,3 +779,19 @@ body {
     justify-content: center;
   }
 }
+
+/* YouTube controls: two columns of toggles on wide screens. */
+.controls-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  column-gap: 32px;
+}
+
+.controls-grid .setting-row + .setting-row {
+  border-top: 0;
+}
+
+.controls-grid .setting-row {
+  border-bottom: 1px solid var(--ui-line);
+  padding: 14px 0;
+}

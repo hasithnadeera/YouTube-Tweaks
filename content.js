@@ -193,7 +193,7 @@
     }
   }
 
-  // Load initial settings (defaults mirrored in popup.js)
+  // Load initial settings
   const SETTING_DEFAULTS = {
     hide_shorts: true,
     speed_selector: true,
@@ -226,7 +226,7 @@
     startExtension();
   });
 
-  // Listen for changes from popup
+  // Listen for changes from the settings page
   chrome.storage.onChanged.addListener((changes, area) => {
     if (area === 'sync') {
       const updates = {};
