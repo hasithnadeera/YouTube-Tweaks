@@ -15,9 +15,7 @@
         <div class="brand">
           <img class="logo" src="icons/icon48.png" alt="" width="42" height="42">
           <div>
-            <p class="eyebrow">TubeTune</p>
-            <h1>Watch analytics</h1>
-            <p class="subtitle">Your viewing time, sponsor skips, and channel activity in one place.</p>
+            <h1>TubeTune</h1>
           </div>
         </div>
       </div>
@@ -25,25 +23,27 @@
         <button class="ghost-btn" id="btn-export-csv" type="button">Export CSV</button>
         <button class="ghost-btn" id="btn-export-json" type="button">Export JSON</button>
         <label class="ghost-btn file-btn">
-          Import JSON
+          Import
           <input type="file" id="input-import" accept="application/json,.json" hidden>
         </label>
-        <button class="ghost-btn danger" id="btn-reset" type="button">Reset all</button>
+        <button class="ghost-btn danger" id="btn-reset" type="button">Reset</button>
       </div>
     </header>
 
-    <section class="card controls-card" aria-labelledby="controls-title">
-      <div class="card-head"><h2 id="controls-title">YouTube controls</h2><span class="card-hint" id="status" role="status" aria-live="polite"></span></div>
-      <div class="controls-grid">
-        <div class="setting-row"><div class="setting-copy"><span class="label">Speed selector</span><p>Current speed: <span id="youtube-speed-value">1×</span> · use [ and ] to step</p></div><label class="switch"><input id="youtube-speed-selector" type="checkbox"><span></span></label></div>
+    <div class="desk">
+    <aside class="desk-controls" aria-labelledby="controls-title">
+      <div class="controls-head"><h2 id="controls-title">On YouTube</h2><span id="status" role="status" aria-live="polite"></span></div>
+      <div class="controls-list">
+        <div class="setting-row"><div class="setting-copy"><span class="label">Speed selector</span><p>Now <span id="youtube-speed-value">1×</span>. Press [ or ] to change.</p></div><label class="switch"><input id="youtube-speed-selector" type="checkbox"><span></span></label></div>
         <div class="setting-row"><div class="setting-copy"><span class="label">Center player</span><p>Hide suggestions and center the video</p></div><label class="switch"><input id="youtube-center-player" type="checkbox"><span></span></label></div>
         <div class="setting-row"><div class="setting-copy"><span class="label">Hide Shorts</span><p>Remove Shorts shelves and navigation entries</p></div><label class="switch"><input id="youtube-hide-shorts" type="checkbox"><span></span></label></div>
         <div class="setting-row"><div class="setting-copy"><span class="label">Hide actions</span><p>Remove Like and Share while keeping Save</p></div><label class="switch"><input id="youtube-hide-actions" type="checkbox"><span></span></label></div>
         <div class="setting-row"><div class="setting-copy"><span class="label">Skip sponsors</span><p>Automatically skip community-flagged segments</p></div><label class="switch"><input id="youtube-skip-sponsors" type="checkbox"><span></span></label></div>
         <div class="setting-row"><div class="setting-copy"><span class="label">Analytics shortcut</span><p>Replace YouTube Create with this page</p></div><label class="switch"><input id="youtube-analytics-shortcut" type="checkbox"><span></span></label></div>
       </div>
-    </section>
+    </aside>
 
+    <main class="desk-log">
     <p class="banner" id="write-banner" hidden></p>
 
     <section class="filter-card" aria-label="Analytics filters">
@@ -112,7 +112,7 @@
         <div class="hbar-list" id="channel-watch-bars"></div>
       </section>
       <section class="card">
-        <div class="card-head"><h2>Sponsors skipped share</h2></div>
+        <div class="card-head"><h2>Sponsor time skipped</h2></div>
         <div class="pie-wrap">
           <svg class="pie" id="skip-pie" viewBox="0 0 120 120" aria-hidden="true"></svg>
           <div class="pie-legend" id="pie-legend"></div>
@@ -164,6 +164,8 @@
       </div>
       <p class="empty" id="video-table-empty" hidden>No videos recorded in this range yet.</p>
     </section>
+    </main>
+    </div>
   </div>
 
   <script src="settings.js"></script>

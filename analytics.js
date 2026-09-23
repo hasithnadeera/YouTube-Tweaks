@@ -4,7 +4,7 @@ const EMPTY_ANALYTICS = { days: {} };
 const EMPTY_STATS = { seconds: 0, count: 0, byCategory: {}, byChannel: {} };
 const WRITE_ERROR_KEY = 'analytics_write_error';
 const SCHEMA_VERSION = 2;
-const PIE_COLORS = ['#ff6a4d', '#ffa25c', '#ffd3a8', '#e05a8a', '#a78bfa', '#5eb8d6', '#8fbf8a', '#78716c'];
+const PIE_COLORS = ['#8ea2ff', '#ffb020', '#5fc7c0', '#c49bff', '#ff7a6b', '#a3b1c6', '#6b7fd6', '#5f6677'];
 const MAX_RANGE_DAYS = 366;
 const RETENTION_DEFAULT = 180;
 
