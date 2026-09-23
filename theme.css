@@ -60,7 +60,7 @@ a:focus-visible,
 /* ---------- Frame ---------- */
 
 .page {
-  width: min(1120px, calc(100% - 48px));
+  width: min(960px, calc(100% - 48px));
   padding: 0 0 80px;
 }
 
@@ -116,6 +116,10 @@ a:focus-visible,
   color: var(--ink);
 }
 
+.ghost-btn.danger {
+  color: var(--ui-danger);
+}
+
 .ghost-btn.danger:hover {
   background: var(--ui-danger-soft);
   color: var(--ui-danger);
@@ -124,11 +128,7 @@ a:focus-visible,
 /* ---------- Layout ---------- */
 
 .desk {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 280px;
-  grid-template-areas: "log controls";
-  gap: 56px;
-  align-items: start;
+  display: block;
 }
 
 .desk-log {
@@ -136,28 +136,65 @@ a:focus-visible,
   min-width: 0;
 }
 
+/* Settings panel: slides in from the right over the page. */
 .desk-controls {
-  grid-area: controls;
-  position: sticky;
-  top: 24px;
-  padding: 4px 20px;
-  border: 0;
-  border-radius: 12px;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 40;
+  width: min(360px, 100%);
+  overflow-y: auto;
+  padding: 8px 24px 24px;
+  border-left: 1px solid var(--rule);
   background: var(--panel);
+  transform: translateX(100%);
+  visibility: hidden;
+  transition: transform 200ms ease, visibility 0s linear 200ms;
+}
+
+body.settings-open .desk-controls {
+  transform: none;
+  visibility: visible;
+  transition: transform 200ms ease;
+}
+
+.settings-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.settings-close {
+  min-height: 28px;
+  margin-left: auto;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.settings-close:hover {
+  background: var(--ui-panel-2);
+  color: var(--ink);
 }
 
 .controls-head {
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  padding: 16px 0 4px;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 0 8px;
 }
 
 .controls-head h2 {
   margin: 0;
-  color: var(--muted);
-  font-size: 13px;
-  font-weight: 500;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 600;
 }
 
 #status {
@@ -596,16 +633,6 @@ a:focus-visible,
 /* ---------- Responsive ---------- */
 
 @media (max-width: 1000px) {
-  .desk {
-    grid-template-columns: 1fr;
-    grid-template-areas: "controls" "log";
-    gap: 40px;
-  }
-
-  .desk-controls {
-    position: static;
-  }
-
   .stats-row {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -633,6 +660,8 @@ a:focus-visible,
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .desk-controls,
+  body.settings-open .desk-controls,
   .switch span,
   .switch span::after {
     transition: none;

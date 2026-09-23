@@ -73,7 +73,31 @@
     });
   }
 
+  // The switches live in a panel that slides in from the right.
+  function bindSettingsPanel() {
+    const panel = byId('settings-panel');
+    const backdrop = byId('settings-backdrop');
+    const openBtn = byId('btn-settings');
+
+    function setOpen(open) {
+      document.body.classList.toggle('settings-open', open);
+      panel.setAttribute('aria-hidden', open ? 'false' : 'true');
+      openBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      backdrop.hidden = !open;
+      if (open) byId('btn-settings-close').focus();
+      else openBtn.focus();
+    }
+
+    openBtn.addEventListener('click', () => setOpen(true));
+    byId('btn-settings-close').addEventListener('click', () => setOpen(false));
+    backdrop.addEventListener('click', () => setOpen(false));
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && document.body.classList.contains('settings-open')) setOpen(false);
+    });
+  }
+
   async function start() {
+    bindSettingsPanel();
     const stored = await chrome.storage.sync.get(null);
     bindYouTubeControls();
     renderYouTubeSettings(stored);
