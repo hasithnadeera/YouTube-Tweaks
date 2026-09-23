@@ -415,21 +415,27 @@ body.ysc-compact-desc #ysc-info-chip {
   display: inline-flex;
   align-items: center;
   height: 36px;
-  margin-right: 8px;
-  padding: 0 14px;
-  border-radius: 18px;
-  background: var(--yt-spec-badge-chip-background, rgba(255, 255, 255, 0.1));
-  color: var(--yt-spec-text-primary, #f1f1f1);
+  margin-left: auto;
+  margin-right: 12px;
+  padding: 0;
+  background: none;
+  color: var(--yt-spec-text-secondary, #aaa);
   font-family: "Roboto", "Arial", sans-serif;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 400;
   white-space: pre;
   cursor: default;
 }
 
 body.ysc-compact-desc #ysc-info-chip:hover,
 body.ysc-compact-desc.ysc-desc-open #ysc-info-chip {
-  background: var(--yt-spec-10-percent-layer, rgba(255, 255, 255, 0.2));
+  color: var(--yt-spec-text-primary, #f1f1f1);
+}
+
+/* Let the actions row fill the space so the label sits right beside Save. */
+body.ysc-compact-desc ytd-watch-metadata #actions {
+  flex: 1 1 auto !important;
+  justify-content: flex-end !important;
 }
 
 body.ysc-compact-desc ytd-watch-metadata {
