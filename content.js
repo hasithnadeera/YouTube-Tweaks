@@ -475,9 +475,8 @@
       removeInfoChip();
       return;
     }
-    // Inside the same button group as Save, so it always sits right beside it.
-    const actions = document.querySelector('ytd-watch-metadata #actions-inner ytd-menu-renderer') ||
-      document.querySelector('ytd-watch-metadata #actions');
+    // Under the subscriber count, next to the channel logo.
+    const actions = document.querySelector('ytd-watch-metadata #owner #upload-info');
     const text = readViewsAndDate();
     if (!actions || !text) return;
 
@@ -493,7 +492,7 @@
       chip.addEventListener('mouseleave', closeDescriptionSoon);
       chip.addEventListener('focus', openDescription);
       chip.addEventListener('blur', closeDescriptionSoon);
-      actions.prepend(chip);
+      actions.appendChild(chip);
     }
     if (chip.textContent !== text) chip.textContent = text;
     bindDescriptionHover();

@@ -412,18 +412,13 @@ body.ysc-hide-comments #comments.ytd-watch-flexy {
 }
 
 body.ysc-compact-desc #ysc-info-chip {
-  display: inline-flex;
-  align-items: center;
-  flex: 0 0 auto;
-  align-self: center;
-  height: 36px;
-  margin-right: 12px;
-  padding: 0;
-  background: none;
+  display: block;
+  margin-top: 2px;
   color: var(--yt-spec-text-secondary, #aaa);
   font-family: "Roboto", "Arial", sans-serif;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 400;
+  line-height: 18px;
   white-space: pre;
   cursor: default;
 }

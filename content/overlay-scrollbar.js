@@ -14,8 +14,19 @@
     return document.scrollingElement || document.documentElement;
   }
 
+  // On YouTube, get out of the way while a video is playing.
+  function youtubeVideoPlaying() {
+    if (location.hostname !== 'youtube.com' && !location.hostname.endsWith('.youtube.com')) return false;
+    const video = document.querySelector('video');
+    return !!(video && !video.paused && !video.ended);
+  }
+
   function update() {
     frame = 0;
+    if (youtubeVideoPlaying()) {
+      thumb.hidden = true;
+      return;
+    }
     const el = scroller();
     const viewport = window.innerHeight;
     const total = el.scrollHeight;
@@ -68,6 +79,7 @@
 
   window.addEventListener('scroll', schedule, { passive: true });
   window.addEventListener('resize', schedule, { passive: true });
+  ['play', 'pause', 'ended'].forEach((type) => document.addEventListener(type, schedule, true));
   if (document.body) mount();
   else document.addEventListener('DOMContentLoaded', mount, { once: true });
 })();
