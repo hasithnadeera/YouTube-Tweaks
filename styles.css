@@ -158,8 +158,7 @@ body.ysc-center-player ytd-watch-next-secondary-results-renderer {
 /* Keep one document-level vertical scroller in centered-player mode. */
 html:has(body.ysc-center-player) {
   overflow-x: clip !important;
-  overflow-y: scroll !important;
-  scrollbar-gutter: stable;
+  overflow-y: auto !important;
 }
 
 /* Clip only the horizontal axis without creating nested vertical scrollers. */
@@ -168,32 +167,6 @@ body.ysc-center-player ytd-page-manager,
 body.ysc-center-player #page-manager {
   overflow-x: clip !important;
   overflow-y: visible !important;
-}
-
-/* Use the same slim thumb in Chromium browsers such as Brave and Helium. */
-html:not([data-bph-scrollbars="true"]):has(body.ysc-center-player)::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-html:not([data-bph-scrollbars="true"]):has(body.ysc-center-player)::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-html:not([data-bph-scrollbars="true"]):has(body.ysc-center-player)::-webkit-scrollbar-thumb {
-  min-height: 36px;
-  background: #aaa;
-  border: 2px solid transparent;
-  border-radius: 8px;
-  background-clip: content-box;
-}
-
-html:not([data-bph-scrollbars="true"]):has(body.ysc-center-player)::-webkit-scrollbar-thumb:hover {
-  background: #c4c4c4;
-}
-
-html:not([data-bph-scrollbars="true"]):has(body.ysc-center-player)::-webkit-scrollbar-corner {
-  background: transparent;
 }
 
 /* Center the primary column */

@@ -1,0 +1,23 @@
+/* Keep the scrollbar visible but remove the track background behind it. */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+  background: transparent;
+}
+
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #8a8a8a;
+  border: 3px solid transparent;
+  border-radius: 12px;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #b0b0b0;
+  background-clip: content-box;
+}

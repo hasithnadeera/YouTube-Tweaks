@@ -29,8 +29,6 @@
       <nav class="side-nav" aria-label="Settings sections">
         <a href="#youtube">YouTube controls</a>
         <a href="#analytics">Watch analytics</a>
-        <a href="#appearance">Appearance</a>
-        <a href="#exceptions">Website exceptions</a>
       </nav>
 
       <div class="content-column">
@@ -145,7 +143,7 @@
           </section>
         </section>
 
-        <section id="appearance" class="card section-card">
+        <section id="appearance" class="card section-card" hidden>
           <div class="section-heading">
             <div><p class="eyebrow">Appearance</p><h2>Scrollbar</h2></div>
             <label class="switch"><input id="scrollbar-enabled" type="checkbox"><span></span></label>
@@ -174,7 +172,7 @@
           <label class="inline-check"><input id="transparent-track" type="checkbox"> Use a transparent scrollbar track</label>
         </section>
 
-        <section id="exceptions" class="card section-card">
+        <section id="exceptions" class="card section-card" hidden>
           <div class="section-heading"><div><p class="eyebrow">Website exceptions</p><h2>Exact hostnames</h2><p class="section-copy">An exception for example.com does not affect www.example.com or its other subdomains.</p></div></div>
           <form id="exception-form" class="exception-form">
             <input id="exception-hostname" type="text" placeholder="example.com" autocomplete="off" aria-label="Hostname">

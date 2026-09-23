@@ -91,7 +91,7 @@
       canClipOverflow ? 'clip' : 'hidden',
       'important'
     );
-    document.documentElement.style.setProperty('overflow-y', 'scroll', 'important');
+    document.documentElement.style.setProperty('overflow-y', 'auto', 'important');
 
     const flexy = document.querySelector('ytd-watch-flexy');
     if (flexy) {

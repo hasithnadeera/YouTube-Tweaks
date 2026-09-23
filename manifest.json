@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "FlowPlay",
-  "version": "3.0.0",
-  "description": "YouTube playback, SponsorBlock, watch analytics, and configurable auto-hiding website scrollbars.",
+  "version": "3.1.0",
+  "description": "YouTube playback, SponsorBlock, and watch analytics.",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
@@ -14,10 +14,8 @@
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*"],
-      "js": ["shared/settings.js", "content/content.js"],
-      "css": ["content/content.css"],
-      "run_at": "document_start",
-      "all_frames": false
+      "css": ["content/scrollbar-track.css"],
+      "run_at": "document_start"
     },
     {
       "matches": ["https://www.youtube.com/*"],
