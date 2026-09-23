@@ -1,45 +1,26 @@
-# FlowPlay 3.0
+# TubeTune
 
-The combined successor to YouTube Tweaks and Brave Powerhouse. This YouTube-Tweaks repository is the final project. FlowPlay has one manifest, one toolbar button and one service worker, with a play-and-scroll icon.
+A YouTube-only browser extension (Manifest V3).
 
 ## Features
 
-- YouTube playback speed controls, keyboard shortcuts, centered player, Hide Shorts and action cleanup.
-- SponsorBlock skipping, local watch analytics, retention controls and analytics export/import.
-- Website scrollbars with configurable dimensions/colors, idle auto-hide (850ms), and Minimal, Comfortable and High Contrast presets.
-- Global website preferences and exact-hostname overrides, applied live.
+- Playback speed selector with `[` / `]` shortcuts, remembered between videos.
+- Centered player: hides suggestions and centers the video.
+- Hide Shorts shelves and navigation entries.
+- Hide Like/Share actions while keeping Save.
+- SponsorBlock segment skipping with progress-bar markers.
+- Local watch analytics (watch time, time saved, channels, top videos) with CSV/JSON export and import.
 
-The popup links to quick YouTube and website controls. The full settings page keeps YouTube controls, watch analytics, appearance, and website exceptions together in one same-page sidebar; website polish has its own master switch and YouTube features retain their individual switches.
+## Install
 
-## Upgrade or install
-
-1. Open brave://extensions. If YouTube Tweaks is already loaded from this folder, reload its card. It becomes FlowPlay and keeps its existing extension identity, YouTube settings and local analytics. Do not remove and reinstall it to upgrade.
-2. For a new installation, enable Developer mode, choose Load unpacked and select this YouTube-Tweaks folder.
-3. If you customized Brave Powerhouse, reload that extension first, open its Advanced settings, and use Export website settings. Import the file in FlowPlay's All web settings → Transfer website settings.
-4. Disable the separate Brave Powerhouse extension to avoid duplicate webpage styling.
-5. Refresh existing webpages. Brave may ask you to accept the expanded website access.
-
-Separate extension identities cannot automatically read each other's storage. Powerhouse preferences start at defaults until imported. The former brave-powerhouse directory is retained as a legacy migration backup; it is no longer the final project.
+1. Open `chrome://extensions` (or `brave://extensions`) and enable Developer mode.
+2. Choose **Load unpacked** and select this folder.
 
 ## Permissions and privacy
 
-storage retains settings and local analytics. activeTab lets the website-controls popup identify the active hostname. The content script runs on top-level HTTP/HTTPS pages, so Brave shows an all-sites access warning. YouTube-specific code still runs only on www.youtube.com.
-
-SponsorBlock and YouTube image hosts keep their original host permissions. SponsorBlock lookup uses a video hash prefix. Watch analytics remain local, and website polish makes no network requests. No remote executable code or third-party runtime dependencies are added.
-
-Protected browser pages, browser chrome, DRM, iframe content and shadow-DOM styling are outside the extension's scope. Auto-hide makes the scrollbar transparent without changing the page width.
+`storage` keeps settings and local analytics. Content scripts run only on `www.youtube.com`. SponsorBlock lookups send only a video-ID hash prefix; analytics never leave the browser.
 
 ## Development
 
-Run npm run icons to regenerate 16/32/48/128px PNGs, and npm run check to validate the manifest, JavaScript, page resources, icons and tests.
-
-content.js and styles.css contain YouTube behavior; content/ and shared/ contain webpage polish. popup.* provides quick YouTube controls, web/ provides website controls, options/ provides the unified settings page, and analytics.* powers both the standalone and embedded watch dashboards.
-
-## Manual browser verification
-
-- Verify YouTube playback, speed keys, centered mode, SponsorBlock and analytics with the standalone Powerhouse disabled.
-- Check scrollbar idle hiding and hover in centered mode and on a long non-YouTube page.
-- Toggle website scrollbar settings and exact-hostname overrides; reload to confirm persistence.
-- Export Powerhouse preferences, import into FlowPlay, and confirm YouTube analytics remain intact.
-
-Automated checks do not substitute for these live Brave checks.
+- `npm run icons` regenerates the 16/32/48/128px PNG icons.
+- `npm run check` validates the manifest, JavaScript syntax, page resources and icons.

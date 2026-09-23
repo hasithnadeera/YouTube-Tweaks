@@ -26,19 +26,16 @@ function mix(top, bottom, amount) {
 function sample(x, y) {
   if (!inRoundedRect(x, y, 2, 2, 92, 92, 22)) return null;
 
-  let color = mix([20, 31, 61], [7, 12, 27], (x + y) / (DESIGN * 2));
-  // A play triangle paired with a scrollbar: both halves of FlowPlay.
-  if (x >= 25 && x <= 61 && Math.abs(y - 48) <= (61 - x) * 0.72) {
-    color = mix([153, 246, 228], [34, 211, 238], y / DESIGN);
+  // TubeTune: warm red-to-orange badge, a white play mark, and rising
+  // "tune" bars for playback speed.
+  let color = mix([255, 59, 71], [255, 138, 61], (x + y) / (DESIGN * 2));
+  if (x >= 18 && x <= 52 && Math.abs(y - 48) <= (52 - x) * 0.66) {
+    color = [255, 255, 255];
   }
-  const rails = [[70, 23, 7, 50]];
-  const thumbs = [[70, 39, 7, 24]];
-  if (thumbs.some((shape) => inRoundedRect(x, y, ...shape, 3.5))) {
-    color = mix([103, 232, 249], [45, 212, 191], x / DESIGN);
-  } else if (rails.some((shape) => inRoundedRect(x, y, ...shape, 3.5))) {
-    color = [49, 65, 94];
+  const bars = [[57, 58, 8, 12], [68, 47, 8, 23], [79, 36, 8, 34]];
+  if (bars.some((shape) => inRoundedRect(x, y, ...shape, 4))) {
+    color = [255, 244, 236];
   }
-
   return color;
 }
 

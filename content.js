@@ -76,39 +76,42 @@
   // scrollbars, and Helium renders those as auto-hidden overlay scrollbars.
   // `clip` removes the horizontal overflow without changing scroll ownership.
 
+  // Set an inline !important style only when it differs; returns true if changed.
+  function setImportant(el, prop, value) {
+    if (el.style.getPropertyValue(prop) === value && el.style.getPropertyPriority(prop) === 'important') return false;
+    el.style.setProperty(prop, value, 'important');
+    return true;
+  }
+
   function fixCenterLayout() {
     if (!centerPlayerEnabled) return;
 
-    // Clip horizontal overflow at the document root while keeping the page's
-    // vertical scrollbar as the one scroll owner. Helium uses overlay
-    // scrollbars by default; an explicit vertical scroll mode lets the CSS
-    // scrollbar styling below request a persistent track.
+    // This runs on every debounced DOM mutation. Dispatching a resize each
+    // time made YouTube re-lay out the player, which caused more mutations,
+    // so the video wiggled left and right. Only nudge YouTube when we
+    // actually changed something.
+    let changed = false;
+    const html = document.documentElement;
     const canClipOverflow =
       window.CSS && typeof window.CSS.supports === 'function' &&
       window.CSS.supports('overflow-x', 'clip');
-    document.documentElement.style.setProperty(
-      'overflow-x',
-      canClipOverflow ? 'clip' : 'hidden',
-      'important'
-    );
-    document.documentElement.style.setProperty('overflow-y', 'auto', 'important');
+    changed = setImportant(html, 'overflow-x', canClipOverflow ? 'clip' : 'hidden') || changed;
 
     const flexy = document.querySelector('ytd-watch-flexy');
     if (flexy) {
       // Remove YouTube's hard-coded width vars so the layout recomputes.
-      flexy.style.setProperty('--ytd-watch-flexy-sidebar-width', '0px', 'important');
-      flexy.style.setProperty('width', '100%', 'important');
-      flexy.style.setProperty('max-width', '100%', 'important');
+      changed = setImportant(flexy, '--ytd-watch-flexy-sidebar-width', '0px') || changed;
+      changed = setImportant(flexy, 'width', '100%') || changed;
+      changed = setImportant(flexy, 'max-width', '100%') || changed;
     }
 
     const columns = document.querySelector('ytd-watch-flexy #columns');
     if (columns) {
-      columns.style.setProperty('width', '100%', 'important');
-      columns.style.setProperty('max-width', '100%', 'important');
+      changed = setImportant(columns, 'width', '100%') || changed;
+      changed = setImportant(columns, 'max-width', '100%') || changed;
     }
 
-    // Nudge YouTube to recalculate its own layout.
-    window.dispatchEvent(new Event('resize'));
+    if (changed) window.dispatchEvent(new Event('resize'));
   }
 
   function clearCenterLayout() {

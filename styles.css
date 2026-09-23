@@ -158,7 +158,9 @@ body.ysc-center-player ytd-watch-next-secondary-results-renderer {
 /* Keep one document-level vertical scroller in centered-player mode. */
 html:has(body.ysc-center-player) {
   overflow-x: clip !important;
-  overflow-y: auto !important;
+  /* Reserve the scrollbar's space so its appearing/disappearing never
+     changes the page width and shifts the centered player. */
+  scrollbar-gutter: stable;
 }
 
 /* Clip only the horizontal axis without creating nested vertical scrollers. */

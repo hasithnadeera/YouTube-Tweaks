@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "FlowPlay",
-  "version": "3.1.0",
-  "description": "YouTube playback, SponsorBlock, and watch analytics.",
+  "name": "TubeTune",
+  "version": "4.0.0",
+  "description": "YouTube speed controls, centered player, SponsorBlock skipping, Shorts cleanup, and local watch analytics.",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
@@ -13,24 +13,29 @@
   },
   "content_scripts": [
     {
-      "matches": ["http://*/*", "https://*/*"],
-      "css": ["content/scrollbar-track.css"],
-      "run_at": "document_start",
-      "all_frames": false
-    },
-    {
-      "matches": ["https://www.youtube.com/*"],
-      "js": ["content.js"],
-      "css": ["styles.css"],
+      "matches": [
+        "https://www.youtube.com/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "styles.css"
+      ],
       "run_at": "document_idle"
     }
   ],
   "action": {
     "default_popup": "popup.html",
-    "default_title": "FlowPlay"
+    "default_title": "TubeTune"
   },
-  "options_ui": { "page": "options/options.html", "open_in_tab": true },
-  "permissions": ["storage", "activeTab"],
+  "options_ui": {
+    "page": "options/options.html",
+    "open_in_tab": true
+  },
+  "permissions": [
+    "storage"
+  ],
   "host_permissions": [
     "https://sponsor.ajay.app/*",
     "https://yt3.ggpht.com/*",

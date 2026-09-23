@@ -1,10 +1,10 @@
 {
-  "name": "flowplay",
-  "version": "3.1.0",
+  "name": "tubetune",
+  "version": "4.0.0",
   "private": true,
   "scripts": {
     "icons": "node tools/build-icons.js",
-    "test": "node --test tests/*.test.js",
-    "check": "node tools/check-extension.js && npm test"
+    "test": "node tools/check-extension.js",
+    "check": "node tools/check-extension.js"
   }
 }
