@@ -13,7 +13,7 @@ assert.equal(manifest.content_scripts.length, 2);
 assert.equal(manifest.content_scripts[0].all_frames, false);
 assert.deepEqual(manifest.content_scripts[1].matches, ['https://www.youtube.com/*']);
 const refs = [manifest.action.default_popup, manifest.options_ui.page, manifest.background.service_worker,
-  ...Object.values(manifest.icons), ...manifest.content_scripts.flatMap(s => [...s.js, ...s.css])];
+  ...Object.values(manifest.icons), ...manifest.content_scripts.flatMap(s => [...(s.js || []), ...(s.css || [])])];
 refs.forEach(p => assert(fs.existsSync(path.join(root, p)), 'Missing: ' + p));
 function walk(dir) {
   return fs.readdirSync(dir, { withFileTypes: true }).filter(e => !['.git','node_modules'].includes(e.name))
