@@ -475,7 +475,9 @@
       removeInfoChip();
       return;
     }
-    const actions = document.querySelector('ytd-watch-metadata #actions');
+    // Inside the same button group as Save, so it always sits right beside it.
+    const actions = document.querySelector('ytd-watch-metadata #actions-inner ytd-menu-renderer') ||
+      document.querySelector('ytd-watch-metadata #actions');
     const text = readViewsAndDate();
     if (!actions || !text) return;
 

@@ -414,8 +414,9 @@ body.ysc-hide-comments #comments.ytd-watch-flexy {
 body.ysc-compact-desc #ysc-info-chip {
   display: inline-flex;
   align-items: center;
+  flex: 0 0 auto;
+  align-self: center;
   height: 36px;
-  margin-left: auto;
   margin-right: 12px;
   padding: 0;
   background: none;
@@ -430,12 +431,6 @@ body.ysc-compact-desc #ysc-info-chip {
 body.ysc-compact-desc #ysc-info-chip:hover,
 body.ysc-compact-desc.ysc-desc-open #ysc-info-chip {
   color: var(--yt-spec-text-primary, #f1f1f1);
-}
-
-/* Let the actions row fill the space so the label sits right beside Save. */
-body.ysc-compact-desc ytd-watch-metadata #actions {
-  flex: 1 1 auto !important;
-  justify-content: flex-end !important;
 }
 
 body.ysc-compact-desc ytd-watch-metadata {
