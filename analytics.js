@@ -59,6 +59,13 @@ function formatDuration(totalSeconds) {
   return `${seconds}s`;
 }
 
+// Editor-style timecode, e.g. 01:19:04. Used for the headline readout.
+function formatTimecode(totalSeconds) {
+  const seconds = Math.max(0, Math.round(totalSeconds));
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${pad(Math.floor(seconds / 3600))}:${pad(Math.floor((seconds % 3600) / 60))}:${pad(seconds % 60)}`;
+}
+
 function initialLetter(name) {
   const ch = (name || '').trim().charAt(0);
   return ch ? ch.toUpperCase() : '?';
@@ -345,41 +352,58 @@ document.addEventListener('DOMContentLoaded', () => {
     return keysBetween(dateFrom.value || todayKey(), dateTo.value || todayKey());
   }
 
+  // Track view: one horizontal track per period, watch time drawn as a clip
+  // and time saved as an amber tail, like clips on an editing timeline.
   function renderTrend(series) {
     trendChart.replaceChildren();
-    // The old 0.01h floor meant a day with <36s watched rendered a bar taller
-    // than its container. Take the real peak and clamp every bar to it.
-    const peak = Math.max(0, ...series.map((s) => Math.max(s.watched, s.saved)));
+    const peak = Math.max(0, ...series.map((p) => p.watched + p.saved));
     const max = peak > 0 ? peak : 1;
     const pct = (value) => `${Math.min(100, Math.max(0, (value / max) * 100))}%`;
 
-    series.forEach((point) => {
-      const col = document.createElement('div');
-      col.className = 'chart-col';
+    const ruler = document.createElement('div');
+    ruler.className = 'track-ruler';
+    ruler.setAttribute('aria-hidden', 'true');
+    [0, 0.25, 0.5, 0.75, 1].forEach((f) => {
+      const tick = document.createElement('span');
+      tick.style.left = `${f * 100}%`;
+      tick.textContent = peak > 0 ? formatDuration(max * f * 3600) : '';
+      ruler.appendChild(tick);
+    });
+    const rulerRow = document.createElement('div');
+    rulerRow.className = 'track-row track-row-ruler';
+    rulerRow.append(document.createElement('span'), ruler, document.createElement('span'));
+    trendChart.appendChild(rulerRow);
 
-      const bars = document.createElement('div');
-      bars.className = 'chart-bars';
+    series.forEach((point, index) => {
+      const row = document.createElement('div');
+      row.className = 'track-row';
+      if (index === series.length - 1) row.classList.add('is-latest');
 
-      const w = document.createElement('div');
-      w.className = 'chart-bar watched';
-      w.style.height = pct(point.watched);
-      w.title = `${point.label}: ${point.watched.toFixed(2)}h watched`;
-
-      const s = document.createElement('div');
-      s.className = 'chart-bar saved';
-      s.style.height = pct(point.saved);
-      s.title = `${point.label}: ${point.saved.toFixed(2)}h saved`;
-
-      bars.appendChild(w);
-      bars.appendChild(s);
-
-      const label = document.createElement('div');
-      label.className = 'chart-label';
+      const label = document.createElement('span');
+      label.className = 'track-label';
       label.textContent = point.label;
 
-      col.appendChild(bars);
-      col.appendChild(label);
-      trendChart.appendChild(col);
+      const track = document.createElement('div');
+      track.className = 'track';
+
+      const clip = document.createElement('div');
+      clip.className = 'clip watched';
+      clip.style.width = pct(point.watched);
+      clip.title = `${point.label}: ${formatDuration(point.watched * 3600)} watched`;
+
+      const saved = document.createElement('div');
+      saved.className = 'clip saved';
+      saved.style.width = pct(point.saved);
+      saved.title = `${point.label}: ${formatDuration(point.saved * 3600)} saved`;
+
+      track.append(clip, saved);
+
+      const value = document.createElement('span');
+      value.className = 'track-value';
+      value.textContent = point.watched > 0 ? formatDuration(point.watched * 3600) : '–';
+
+      row.append(label, track, value);
+      trendChart.appendChild(row);
     });
   }
 
@@ -568,8 +592,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const days = analytics.days || {};
     const agg = aggregateRange(days, keys);
 
-    statWatched.textContent = formatDuration(agg.watched);
-    statSaved.textContent = formatDuration(agg.skipped);
+    statWatched.textContent = formatTimecode(agg.watched);
+    statWatched.title = formatDuration(agg.watched);
+    statSaved.textContent = `−${formatTimecode(agg.skipped)}`;
+    statSaved.title = formatDuration(agg.skipped);
     statVideos.textContent = String(agg.videoCount);
     statChannels.textContent = String(agg.channelCount);
     statData.textContent = formatMegabytes(agg.estimatedMb);
