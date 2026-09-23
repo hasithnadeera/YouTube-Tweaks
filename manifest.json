@@ -14,6 +14,17 @@
   "content_scripts": [
     {
       "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "css": [
+        "content/scrollbar-track.css"
+      ],
+      "run_at": "document_start",
+      "all_frames": true
+    },
+    {
+      "matches": [
         "https://www.youtube.com/*"
       ],
       "js": [
