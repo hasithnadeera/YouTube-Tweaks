@@ -5,12 +5,37 @@
   'use strict';
 
   const CATEGORY_KEY = 'channel_categories';
-  const CATEGORIES = ['Learning', 'Entertainment', 'Music', 'News', 'Gaming', 'Other'];
+  const CATEGORIES = ['Learning', 'Tech', 'Entertainment', 'Music', 'News', 'Gaming', 'Other'];
+  const GENRE_KEY = 'channel_genres';
+  // YouTube's own video categories, mapped onto ours.
+  const GENRE_TO_CATEGORY = {
+    'Education': 'Learning',
+    'Howto & Style': 'Learning',
+    'Science & Technology': 'Tech',
+    'Entertainment': 'Entertainment',
+    'Comedy': 'Entertainment',
+    'Film & Animation': 'Entertainment',
+    'People & Blogs': 'Entertainment',
+    'Pets & Animals': 'Entertainment',
+    'Travel & Events': 'Entertainment',
+    'Autos & Vehicles': 'Entertainment',
+    'Sports': 'Entertainment',
+    'Shows': 'Entertainment',
+    'Movies': 'Entertainment',
+    'Trailers': 'Entertainment',
+    'Music': 'Music',
+    'News & Politics': 'News',
+    'Gaming': 'Gaming',
+    'Nonprofits & Activism': 'Other'
+  };
   const UNSORTED = 'Not sorted';
 
   let days = {};
   let rangeKeys = [];
   let categories = {};
+  let genres = {};
+  let genresLoaded = false;
+  let autoSortRunning = false;
 
   const $ = (id) => document.getElementById(id);
 
@@ -122,8 +147,61 @@
 
   // ─── Categories ─────────────────────────────────────────────────
 
+  function autoCategory(id) {
+    return GENRE_TO_CATEGORY[genres[id]] || '';
+  }
+
+  // A category picked by hand always wins over the automatic one.
   function categoryOf(id) {
-    return categories[id] || UNSORTED;
+    return categories[id] || autoCategory(id) || UNSORTED;
+  }
+
+  // ─── Auto-sort ──────────────────────────────────────────────────
+  // For each channel without a known genre, open one of its watched videos
+  // and read the category YouTube assigned to it.
+
+  function sampleVideoId(channelId) {
+    const keys = Object.keys(days).sort().reverse();
+    for (const key of keys) {
+      const ch = days[key].channels && days[key].channels[channelId];
+      if (!ch) continue;
+      const id = Object.keys(channelVideos(ch))[0];
+      if (id) return id;
+    }
+    return '';
+  }
+
+  async function fetchGenre(videoId) {
+    const res = await fetch(`https://www.youtube.com/watch?v=${encodeURIComponent(videoId)}`, { credentials: 'omit' });
+    if (!res.ok) return '';
+    const html = await res.text();
+    const match = html.match(/"category":"([^"]+)"/) || html.match(/itemprop="genre" content="([^"]+)"/);
+    return match ? match[1].replace(/\\u0026/g, '&').replace(/&amp;/g, '&') : '';
+  }
+
+  async function autoSort() {
+    if (autoSortRunning || !genresLoaded) return;
+    const todo = Object.keys(sumDays(Object.keys(days)).channels).filter((id) => !(id in genres));
+    if (!todo.length) return;
+    autoSortRunning = true;
+    try {
+      // A few at a time, so a long history doesn't fire hundreds of requests at once.
+      for (let i = 0; i < todo.length; i += 4) {
+        await Promise.all(todo.slice(i, i + 4).map(async (id) => {
+          const videoId = sampleVideoId(id);
+          try {
+            genres[id] = videoId ? await fetchGenre(videoId) : '';
+          } catch (_) {
+            // Offline or blocked: try again next time the page opens.
+          }
+        }));
+        chrome.storage.local.set({ [GENRE_KEY]: genres }, () => void chrome.runtime.lastError);
+        renderCategoryBars();
+        if (!$('category-list').contains(document.activeElement)) renderCategoryEditor();
+      }
+    } finally {
+      autoSortRunning = false;
+    }
   }
 
   function renderCategoryBars() {
@@ -188,10 +266,11 @@
 
       const select = document.createElement('select');
       select.setAttribute('aria-label', `Category for ${ch.name}`);
+      const auto = autoCategory(ch.id);
       [UNSORTED, ...CATEGORIES].forEach((cat) => {
         const option = document.createElement('option');
         option.value = cat === UNSORTED ? '' : cat;
-        option.textContent = cat;
+        option.textContent = cat === UNSORTED ? (auto ? `Auto: ${auto}` : UNSORTED) : cat;
         select.appendChild(option);
       });
       select.value = categories[ch.id] || '';
@@ -262,6 +341,7 @@
     // Don't rebuild the list under someone picking a category.
     if (!$('category-list').contains(document.activeElement)) renderCategoryEditor();
     searchHistory($('history-search').value);
+    autoSort();
   }
 
   document.addEventListener('tubetune:render', (event) => {
@@ -276,6 +356,13 @@
       clearTimeout(timer);
       timer = setTimeout(() => searchHistory(e.target.value), 150);
     });
+  });
+
+  chrome.storage.local.get({ [GENRE_KEY]: {} }, (data) => {
+    if (!chrome.runtime.lastError) genres = data[GENRE_KEY] || {};
+    genresLoaded = true;
+    renderCategoryBars();
+    autoSort();
   });
 
   chrome.storage.sync.get({ [CATEGORY_KEY]: {} }, (data) => {
